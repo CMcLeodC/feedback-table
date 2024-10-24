@@ -1,0 +1,16 @@
+# Node modules directory
+node_modules
+
+# Production build files
+dist
+
+# Environment variables file
+.env
+
+# Logs
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Optional: macOS-specific hidden files (if working on Mac)
+.DS_Store
