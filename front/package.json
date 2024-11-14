@@ -4,12 +4,13 @@
     "@popperjs/core": "^2.11.8",
     "bootstrap": "^4.6.2",
     "bootstrap-icons": "^1.11.3",
-    "bootstrap-vue": "^2.23.1",
+    "bootstrap-vue-next": "^0.25.7",
     "vue": "^3.5.12",
     "vuetable-2": "^2.0.0-beta.4"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
+    "unplugin-vue-components": "^0.27.4",
     "vite": "^5.4.9"
   },
   "scripts": {
