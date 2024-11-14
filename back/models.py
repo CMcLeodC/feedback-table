@@ -152,6 +152,22 @@ class Contents_Marketplace(db.Model):
     def __repr__(self):
         return f"<ContentsMarketplace content_id={self.content_id}, lang_id={self.lang_id}, key={self.key}>"
 
+class Languages(db.Model):
+    __tablename__ = 'languages'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(255))
+    local_name = db.Column(db.String(255))
+    i18n = db.Column(db.String(255))
+    iso_code = db.Column(db.String(10))
+    active = db.Column(db.Integer)
+    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+
+    def __repr__(self):
+        return f'<Languages id={self.id}, name={self.name}>'
+
+
 class Feedback(db.Model):
     __tablename__ = 'feedback'
 
@@ -160,7 +176,7 @@ class Feedback(db.Model):
     dreamer_id = db.Column(db.Integer, db.ForeignKey('dreamers.id'))
     content_id = db.Column(db.Integer, db.ForeignKey('contents.id'))
     library_version_id = db.Column(db.Integer)
-    lang_id = db.Column(db.Integer)
+    lang_id = db.Column(db.Integer, db.ForeignKey('languages.id'))
     type_id = db.Column(db.Integer)
     game_mode_id = db.Column(db.Integer)
     reading_mode_id = db.Column(db.Integer)
@@ -184,6 +200,7 @@ class Feedback(db.Model):
     dreamer = db.relationship('Dreamers', backref='feedbacks')
     content = db.relationship('Contents', backref='feedbacks')
     level = db.relationship('Levels', backref='feedbacks')
+    language = db.relationship('Languages', backref='feedbacks')
 
     content_data = db.relationship(
         'Contents_Marketplace',
@@ -191,7 +208,8 @@ class Feedback(db.Model):
             foreign(content_id) == Contents_Marketplace.content_id,
             foreign(lang_id) == Contents_Marketplace.lang_id
         ),
-        viewonly=True
+        viewonly=True,
+        uselist=True
     )
 
     def serialize(self):
@@ -200,6 +218,15 @@ class Feedback(db.Model):
             'user_id': self.user_id,
             'dreamer_id': self.dreamer_id,
             'content_id': self.content_id,
+            'content_data': [
+                {
+                    'key': item.key,
+                    'value': item.value,
+                    'created_at': item.created_at.isoformat() if item.created_at else None,
+                    'updated_at': item.updated_at.isoformat() if item.updated_at else None
+                }
+                for item in self.content_data
+            ] if self.content_data else None,
             'library_version_id': self.library_version_id,
             'lang_id': self.lang_id,
             'type_id': self.type_id,
