@@ -5,8 +5,11 @@
     "bootstrap": "^4.6.2",
     "bootstrap-icons": "^1.11.3",
     "bootstrap-vue-next": "^0.25.7",
+    "pinia": "^2.2.6",
     "vue": "^3.5.12",
-    "vuetable-2": "^2.0.0-beta.4"
+    "vuetable-2": "^2.0.0-beta.4",
+    "vuetify": "^3.7.4",
+    "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^5.1.4",
