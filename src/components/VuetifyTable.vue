@@ -2,11 +2,9 @@
     <v-data-table
     :headers="store.fields"
     :items="store.feedbackList"
-    :sort-by="[{ key: store.sortBy, order: 'desc' }, { key: 'duration', order: 'desc' }]"
-    multi-sort
+    :sort-by="[{ key: store.sortBy, order: 'desc' }]"
   ></v-data-table>
-  {{ console.log("console logged store.fields: ", store.fields) }}
-  {{ console.log("console logged store.feedbacklist: ", store.feedbackList) }}
+
 </template>
 
 <script setup>
@@ -15,7 +13,7 @@ import { useStore } from '../store';
 import { storeToRefs } from 'pinia';
 const store = useStore()
 
-const { fields, sortBy, feedbackList } = storeToRefs(store)
+const { fields, sortBy, feedbackList, sortDesc, filterValue, currentPage, perPage } = storeToRefs(store)
 
 const data = () => {
       return {
@@ -27,6 +25,8 @@ const data = () => {
 onMounted(() => {
   store.fetchFeedback();
 });
+
+
 </script>
 
 <style>

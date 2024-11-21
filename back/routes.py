@@ -178,7 +178,7 @@ def get_feedback():
     sortable_fields = {
         'created_at': Feedback.created_at,
         'duration': Feedback.duration,
-        'total_score': Feedback.total_score,
+        'score': Feedback.score,
         'user_name': Users.name,
         'dreamer_name': Dreamers.name,
         'content_title': Contents_Marketplace.value,

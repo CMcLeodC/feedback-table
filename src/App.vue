@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <h1>Feedback</h1>
-    <VuetifyTable />
+    <!-- <VuetifyTable /> -->
     <div class="input-field">
       <input type="search" v-model="filterValue" id="search-bar" placeholder="Search feedback..."
         @keyup.enter="fetchFeedback">

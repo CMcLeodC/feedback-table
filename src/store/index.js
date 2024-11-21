@@ -50,11 +50,25 @@ export const useStore = defineStore('storeID', {
           // totalRows.value = data.total
           this.feedbackList = data.data
           console.log("data.total is: ", data.total)
-          console.log("Feedback list: ", this.feedbackList);
+          console.log("Feedback list from fetchFeedback: ", this.feedbackList);
         })
         .catch((error) => {
           console.error('Error:', error);
         });
     },
-  }
+    sortTable (columnTitle) {
+      if (this.sortBy === columnTitle) {
+        this.sortDesc = !this.sortDesc;
+        console.log("If yes ColumnTitle: ", columnTitle);
+      } else {
+        this.sortBy = columnTitle;
+        this.sortDesc = false;
+        console.log("Else ColumnTitle: ", columnTitle);
+      }
+      
+      console.log("sortTable working");
+      
+      this.fetchFeedback();
+    }
+   }
 })

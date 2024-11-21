@@ -3,43 +3,43 @@
     <thead>
         <tr>
             <th>#</th>
-            <th @click="sortTable('created_at')">
+            <th @click="store.sortTable('created_at')">
                 Date
                 <span :class="['arrow', sortBy === 'created_at' && !sortDesc ? 'active' : '']">▲</span>
                 <span :class="['arrow', sortBy === 'created_at' && sortDesc ? 'active' : '']">▼</span>
             </th>
             <th>Avatar</th>
-            <th @click="sortTable('dreamer_name')">
+            <th @click="store.sortTable('dreamer_name')">
                 Dreamer
                 <span :class="['arrow', sortBy === 'dreamer_name' && !sortDesc ? 'active' : '']">▲</span>
                 <span :class="['arrow', sortBy === 'dreamer_name' && sortDesc ? 'active' : '']">▼</span>
             </th>
-            <th @click="sortTable('user_name')">
+            <th @click="store.sortTable('user_name')">
                 User
                 <span :class="['arrow', sortBy === 'user_name' && !sortDesc ? 'active' : '']">▲</span>
                 <span :class="['arrow', sortBy === 'user_name' && sortDesc ? 'active' : '']">▼</span>
             </th>
-            <th @click="sortTable('content_title')">
+            <th @click="store.sortTable('content_title')">
                 Content
                 <span :class="['arrow', sortBy === 'content_title' && !sortDesc ? 'active' : '']">▲</span>
                 <span :class="['arrow', sortBy === 'content_title' && sortDesc ? 'active' : '']">▼</span>
             </th>
-            <th @click="sortTable('level_name')">
+            <th @click="store.sortTable('level_name')">
                 Difficulty Level
                 <span :class="['arrow', sortBy === 'level_name' && !sortDesc ? 'active' : '']">▲</span>
                 <span :class="['arrow', sortBy === 'level_name' && sortDesc ? 'active' : '']">▼</span>
             </th>
-            <th @click="sortTable('duration')">
+            <th @click="store.sortTable('duration')">
                 Time (Seconds)
                 <span :class="['arrow', sortBy === 'duration' && !sortDesc ? 'active' : '']">▲</span>
                 <span :class="['arrow', sortBy === 'duration' && sortDesc ? 'active' : '']">▼</span>
             </th>
-            <th @click="sortTable('score')">
+            <th @click="store.sortTable('score')">
                 Score
                 <span :class="['arrow', sortBy === 'score' && !sortDesc ? 'active' : '']">▲</span>
                 <span :class="['arrow', sortBy === 'score' && sortDesc ? 'active' : '']">▼</span>
             </th>
-            <th>Actions</th> <!-- Actions column -->
+            <th>Actions</th>
         </tr>
     </thead>
     <tbody>
@@ -64,18 +64,21 @@
 
 </template>
 
-<script>
-export default {
-    props: {
-        feedbackList: Object,
-        sortBy: String,
-        sortDesc: Boolean
-    }
-}
+<script setup>
+import { onMounted } from 'vue';
+import { useStore } from '../store';
+import { storeToRefs } from 'pinia';
+const store = useStore()
+
+const { fields, sortBy, feedbackList, sortDesc, sortTable } = storeToRefs(store)
+
+onMounted(() => {
+  store.fetchFeedback();
+});
 </script>
 <style>
 table th, td {
-    color: white;
+    color: white !important;
 }
 .arrow {
     color: gray;
