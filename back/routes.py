@@ -224,9 +224,9 @@ def get_feedback():
     .join(Contents, Feedback.content_id == Contents.id)\
     .join(Levels, Feedback.level_id == Levels.id)\
     .join(Languages, Feedback.lang_id == Languages.id)\
-    .join(Contents_Marketplace,
-          and_(Feedback.content_id == Contents_Marketplace.content_id,
-               Feedback.lang_id == Contents_Marketplace.lang_id))
+    # .join(Contents_Marketplace,
+    #       and_(Feedback.content_id == Contents_Marketplace.content_id,
+    #            Feedback.lang_id == Contents_Marketplace.lang_id))
 
         
     

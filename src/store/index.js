@@ -1,25 +1,5 @@
 import { defineStore } from 'pinia'
 
-// You can name the return value of `defineStore()` anything you want,
-// but it's best to use the name of the store and surround it with `use`
-// and `Store` (e.g. `useUserStore`, `useCartStore`, `useProductStore`)
-// the first argument is a unique id of the store across your application
-export const useAlertsStore = defineStore('alerts', {
-  // other options...
-})
-
-export const useCounterStore = defineStore('counter', {
-  state: () => ({ count: 0, name: 'Connor'}),
-  getters: {
-    doubleCount: (state) => state.count * 2,
-  },
-  actions: {
-    increment() {
-      this.count++
-    },
-  },
-})
-
 export const useStore = defineStore('storeID', {
   state: () => ({
     fields: ([
@@ -38,9 +18,11 @@ export const useStore = defineStore('storeID', {
     sortBy: "user_name",
     filterValue: "",
     sortDesc: false,
-    currentPage: 1,
-    perPage: 30
-
+    currentPage: 2,
+    perPage: 30,
+    dataTotal: 30,
+    pageCount: 3
+    
   }),
   actions: {
     fetchFeedback () {
@@ -49,8 +31,10 @@ export const useStore = defineStore('storeID', {
         .then((data) => {
           // totalRows.value = data.total
           this.feedbackList = data.data
+          this.dataTotal = data.total
           console.log("data.total is: ", data.total)
           console.log("Feedback list from fetchFeedback: ", this.feedbackList);
+          this.countPages(this.dataTotal, this.perPage);
         })
         .catch((error) => {
           console.error('Error:', error);
@@ -69,6 +53,9 @@ export const useStore = defineStore('storeID', {
       console.log("sortTable working");
       
       this.fetchFeedback();
+    },
+    countPages (dataTotal, perPage) {
+      this.pageCount = Math.ceil(dataTotal/perPage)
     }
    }
 })

@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <h1>Feedback</h1>
-    <!-- <VuetifyTable /> -->
+    <VuetifyTable />
     <div class="input-field">
       <input type="search" v-model="filterValue" id="search-bar" placeholder="Search feedback..."
         @keyup.enter="fetchFeedback">
@@ -49,7 +49,7 @@ const sortBy = ref("user_name");
 const sortDesc = ref(false);
 const selectedID = ref(null);
 const perPage = ref(30);
-const currentPage = ref(1);
+// const currentPage = ref(1);
 const totalRows = ref(null)
 
 
@@ -59,35 +59,35 @@ const rows = computed(() => feedbackList.value.length)
 const handleAvatarUrl = (val) => {
   return `http://localhost:5000/back/images/dreamer_avatars/AvatarSprite_${val}.png`
 }
-const openModalWithID = (id) => {
-  selectedID.value = id
-  fetch('/api/feedback/' + id)
-    .then((response) => response.json())
-    .then((data) => {
-      moreInfo.value = data;
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
-}
+// const openModalWithID = (id) => {
+//   selectedID.value = id
+//   fetch('/api/feedback/' + id)
+//     .then((response) => response.json())
+//     .then((data) => {
+//       moreInfo.value = data;
+//     })
+//     .catch((error) => {
+//       console.error('Error:', error);
+//     });
+// }
 
-const fetchFeedback = () => {
-  fetch(`/api/feedback?filter=${filterValue.value}&sort=${sortBy.value}&desc=${sortDesc.value}&page=${currentPage.value}&per_page=${perPage.value}`)
-    .then((response) => response.json())
-    .then((data) => {
-      totalRows.value = data.total
-      feedbackList.value = data.data
-      console.log("data.total is: ", data.total)
-      console.log("Feedback list: ", feedbackList.value);
-    })
-    .catch((error) => {
-      console.error('Error:', error);
-    });
-};
+// const fetchFeedback = () => {
+//   fetch(`/api/feedback?filter=${filterValue.value}&sort=${sortBy.value}&desc=${sortDesc.value}&page=${currentPage.value}&per_page=${perPage.value}`)
+//     .then((response) => response.json())
+//     .then((data) => {
+//       totalRows.value = data.total
+//       feedbackList.value = data.data
+//       console.log("data.total is: ", data.total)
+//       console.log("Feedback list: ", feedbackList.value);
+//     })
+//     .catch((error) => {
+//       console.error('Error:', error);
+//     });
+// };
 
-onMounted(() => {
-  fetchFeedback();
-});
+// onMounted(() => {
+//   fetchFeedback();
+// });
 
 </script>
 

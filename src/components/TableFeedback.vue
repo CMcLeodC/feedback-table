@@ -56,7 +56,7 @@
             <td>{{ item.duration }}</td>
             <td>{{ item.score }}</td>
             <td>
-                <button @click="handleAction(item)">Action</button>
+                <!-- <button @click="handleAction(item)">Action</button> -->
             </td>
         </tr>
     </tbody>
@@ -77,9 +77,9 @@ onMounted(() => {
 });
 </script>
 <style>
-table th, td {
+/* table th, td {
     color: white !important;
-}
+} */
 .arrow {
     color: gray;
     font-size: 0.75em;

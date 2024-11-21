@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="container">
         <div class="counter">
             {{ store.count }}
@@ -43,4 +43,4 @@ div {
     justify-self: center;
 }
 
-</style>
+</style> -->
