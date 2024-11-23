@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <h1>Feedback</h1>
-    <VuetifyTable />
+    <!-- <VuetifyTable /> -->
     <div class="input-field">
       <input type="search" v-model="filterValue" id="search-bar" placeholder="Search feedback..."
         @keyup.enter="fetchFeedback">
@@ -39,7 +39,7 @@ import VuetifyTable from './components/VuetifyTable.vue';
 
 const store = useStore()
 
-const { fields } = storeToRefs(store)
+const { fields, fetchFeedback } = storeToRefs(store)
 
 const isModalOpen = ref(false);
 const filterValue = ref("");
@@ -85,9 +85,9 @@ const handleAvatarUrl = (val) => {
 //     });
 // };
 
-// onMounted(() => {
-//   fetchFeedback();
-// });
+onMounted(() => {
+  store.fetchFeedback();
+});
 
 </script>
 

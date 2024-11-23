@@ -15,6 +15,17 @@
         ></v-pagination>
       </div>
     </template>
+    <template v-slot:item.actions="{ item }">
+      <v-btn
+          text="More Info"
+          class="text-none"
+          size="small"
+          variant="flat"
+          flat
+          @click="store.openModalWithID(item.id)"
+          
+        ></v-btn>
+    </template>
 </v-data-table>
   {{ console.log("currentPage from vuetify table component: ", currentPage) }}
 </template>
@@ -25,18 +36,11 @@ import { useStore } from '../store';
 import { storeToRefs } from 'pinia';
 const store = useStore()
 
-const { fields, sortBy, feedbackList, sortDesc, filterValue, currentPage, perPage, pageCount } = storeToRefs(store)
+const { fields, sortBy, feedbackList, sortDesc, filterValue, currentPage, perPage, pageCount, openModalWithID } = storeToRefs(store)
 
-const data = () => {
-      return {
-        // headers: store.fields,
-        
-      }
-    }
-
-onMounted(() => {
-  store.fetchFeedback();
-});
+// onMounted(() => {
+//   store.fetchFeedback();
+// });
 
 
 </script>

@@ -18,44 +18,42 @@ export const useStore = defineStore('storeID', {
     sortBy: "user_name",
     filterValue: "",
     sortDesc: false,
-    currentPage: 2,
+    currentPage: 1,
     perPage: 30,
     dataTotal: 30,
-    pageCount: 3
-    
+    pageCount: 3,
+    moreInfo: ({}),
+    // selectedID: (null)
   }),
   actions: {
-    fetchFeedback () {
-      fetch(`/api/feedback?filter=${this.filterValue}&sort=${this.sortBy}&desc=${this.sortDesc}&page=${this.currentPage}&per_page=${this.perPage}`)
+    async fetchFeedback() {
+      try {
+          const response = await fetch(`/api/feedback?filter=${this.filterValue}&sort=${this.sortBy}&desc=${this.sortDesc}&page=${this.currentPage}&per_page=${this.perPage}`);
+          const data = await response.json();
+          this.feedbackList = data.data;
+          this.totalItems = data.total; 
+          this.pageCount = Math.ceil(this.totalItems / this.perPage);
+          console.log(this.feedbackList);
+      } catch (error) {
+          console.error("Error fetching feedback:", error);
+          
+          
+      }
+    },
+    countPages (dataTotal, perPage) {
+      this.pageCount = Math.ceil(dataTotal/perPage)
+    },
+    openModalWithID (id) {
+      // selectedID.value = id
+      fetch('/api/feedback/' + id)
         .then((response) => response.json())
         .then((data) => {
-          // totalRows.value = data.total
-          this.feedbackList = data.data
-          this.dataTotal = data.total
-          console.log("data.total is: ", data.total)
-          console.log("Feedback list from fetchFeedback: ", this.feedbackList);
-          this.countPages(this.dataTotal, this.perPage);
+          this.moreInfo = data;
         })
         .catch((error) => {
           console.error('Error:', error);
         });
-    },
-    sortTable (columnTitle) {
-      if (this.sortBy === columnTitle) {
-        this.sortDesc = !this.sortDesc;
-        console.log("If yes ColumnTitle: ", columnTitle);
-      } else {
-        this.sortBy = columnTitle;
-        this.sortDesc = false;
-        console.log("Else ColumnTitle: ", columnTitle);
-      }
-      
-      console.log("sortTable working");
-      
-      this.fetchFeedback();
-    },
-    countPages (dataTotal, perPage) {
-      this.pageCount = Math.ceil(dataTotal/perPage)
     }
+    
    }
 })

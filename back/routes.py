@@ -181,7 +181,7 @@ def get_feedback():
         'score': Feedback.score,
         'user_name': Users.name,
         'dreamer_name': Dreamers.name,
-        'content_title': Contents_Marketplace.value,
+        'content_title': title_subquery,
         'level_name': Levels.name
     }
 

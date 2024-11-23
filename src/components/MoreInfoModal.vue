@@ -1,40 +1,40 @@
 <template>
-    <BModal id="modal-center" centered size="lg" :title="moreInfo.content_title">
+    <BModal id="modal-center" centered size="lg" :title="store.moreInfo.content_title">
         <BRow>
             <BCol>
-              <template v-for="(contentData, index) in moreInfo.content_data" :key="index">
+              <template v-for="(contentData, index) in store.moreInfo.content_data" :key="index">
                     <p v-if="index === 0">
                         {{ contentData }}
                     </p>
                 </template>
             </BCol>
             <BCol>
-              <template v-for="(contentData, index) in moreInfo.content_data" :key="index">
+              <template v-for="(contentData, index) in store.moreInfo.content_data" :key="index">
                     <p v-if="index === 1">
                         {{ contentData }}
                     </p>
                 </template>
             </BCol>
             <BCol>
-                <p>language: {{ moreInfo.lang_local_name }}</p>
-                <p>score: {{ moreInfo.score }}</p>
-                <p>failures: {{ moreInfo.failures }}</p>
-                <p>total: {{ moreInfo.total_score }}</p>
+                <p>language: {{ store.moreInfo.lang_local_name }}</p>
+                <p>score: {{ store.moreInfo.score }}</p>
+                <p>failures: {{ store.moreInfo.failures }}</p>
+                <p>total: {{ store.moreInfo.total_score }}</p>
             </BCol>
         </BRow>
       <!-- <img :src="moreInfo.avatarURL" alt="Dreamer Avatar" style="width: 75px; height: 75px;" /> -->
     </BModal>
 </template>
 
-<script>
+<script setup>
+import { onMounted } from 'vue';
+import { useStore } from '../store';
+import { storeToRefs } from 'pinia';
+const store = useStore()
 
-export default {
-    props: {
-        moreInfo: Object
-    }
-
+const { moreInfo } = storeToRefs(store)
     
-}
+
 
 </script>
 
