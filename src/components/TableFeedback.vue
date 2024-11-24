@@ -48,7 +48,7 @@
                     <td>{{ index + 1 + (currentPage - 1) * perPage }}</td>
                     <td>{{ item.created_at }}</td>
                     <td>
-                        <img :src="item.dreamer_avatar" alt="Dreamer Avatar" class="avatar" />
+                        <img :src="store.handleAvatarUrl(item.dreamer_avatar)" alt="Dreamer Avatar" class="avatar" />
                     </td>
                     <td>{{ item.dreamer_name }}</td>
                     <td>{{ item.user_name }}</td>
@@ -57,7 +57,7 @@
                     <td>{{ item.duration }}</td>
                     <td>{{ item.score }}</td>
                     <td>
-                        <!-- <button @click="handleAction(item)">Action</button> -->
+                        <button @click="store.openModalWithID(item.id)">Action</button>
                     </td>
                 </tr>
             </tbody>
@@ -77,7 +77,7 @@ import { useStore } from '../store';
 import { storeToRefs } from 'pinia';
 const store = useStore()
 
-const { sortBy, feedbackList, sortDesc, currentPage, pageCount, perPage, fetchFeedback } = storeToRefs(store)
+const { sortBy, feedbackList, sortDesc, currentPage, pageCount, perPage } = storeToRefs(store)
 
 const nextPage = () => {
     if (currentPage.value < pageCount.value) {

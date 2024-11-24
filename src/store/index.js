@@ -49,10 +49,15 @@ export const useStore = defineStore('storeID', {
         .then((response) => response.json())
         .then((data) => {
           this.moreInfo = data;
+          console.log("this.moreInfo: ", this.moreInfo);
+          
         })
         .catch((error) => {
           console.error('Error:', error);
         });
+    },
+    handleAvatarUrl (val) {
+      return `http://localhost:5000/back/images/dreamer_avatars/AvatarSprite_${val}.png`
     }
     
    }

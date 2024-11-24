@@ -56,9 +56,7 @@ const totalRows = ref(null)
 
 const rows = computed(() => feedbackList.value.length)
 
-const handleAvatarUrl = (val) => {
-  return `http://localhost:5000/back/images/dreamer_avatars/AvatarSprite_${val}.png`
-}
+
 // const openModalWithID = (id) => {
 //   selectedID.value = id
 //   fetch('/api/feedback/' + id)
