@@ -23,7 +23,13 @@ export const useStore = defineStore('storeID', {
     dataTotal: 30,
     pageCount: 3,
     moreInfo: ({}),
-    // selectedID: (null)
+    showModal: false,
+    dreamerInfo: [],
+    cards: [
+      { title: 'Pre-fab homes', src: 'https://cdn.vuetifyjs.com/images/cards/house.jpg', flex: 4 },
+      { title: 'Favorite road trips', src: 'https://cdn.vuetifyjs.com/images/cards/road.jpg', flex: 4 },
+      { title: 'Best airlines', src: 'https://cdn.vuetifyjs.com/images/cards/plane.jpg', flex: 4 },
+    ]
   }),
   actions: {
     async fetchFeedback() {
@@ -44,13 +50,14 @@ export const useStore = defineStore('storeID', {
       this.pageCount = Math.ceil(dataTotal/perPage)
     },
     openModalWithID (id) {
-      // selectedID.value = id
       fetch('/api/feedback/' + id)
         .then((response) => response.json())
         .then((data) => {
           this.moreInfo = data;
           console.log("this.moreInfo: ", this.moreInfo);
-          
+          this.showModal = true;
+          console.log("This particular dreamer_id is: ", data.dreamer_id);          
+          this.fetchDreamer(data.dreamer_id);
         })
         .catch((error) => {
           console.error('Error:', error);
@@ -58,6 +65,17 @@ export const useStore = defineStore('storeID', {
     },
     handleAvatarUrl (val) {
       return `http://localhost:5000/back/images/dreamer_avatars/AvatarSprite_${val}.png`
+    },
+    fetchDreamer (id) {
+      fetch('/api/dreamers/' + id)
+      .then((response) => response.json())
+      .then((data) =>{
+        this.dreamerInfo = data;
+        console.log("This is the dreamer Info: ", data);        
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
     }
     
    }

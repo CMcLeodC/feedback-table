@@ -8,22 +8,11 @@
       {{ console.log(filterValue) }}
     </div>
     {{console.log(sortBy)}}
-    <!-- <div class="feedback-table">
-      <Bootstraptable 
-        :feedbackList="feedbackList" 
-        :fields="store.fields"
-        :sortBy="sortBy"
-        :sortDesc="sortDesc"
-        :currentPage="currentPage"
-        :perPage="perPage"
-        :totalRows="totalRows"
-        :handleAvatarUrl="handleAvatarUrl"
-        />
-    </div> -->
 
     <TableFeedback :feedbackList="feedbackList" :fields="store.fields" :sortBy="sortBy" :sortDesc="sortDesc" />
 
-    <MoreInfoModal :moreInfo="moreInfo" />
+    <!-- <MoreInfoModal :moreInfo="moreInfo" /> -->
+    <VuetifyModal />
   </div>
   {{console.log(sortBy)}}
 </template>
@@ -36,7 +25,8 @@ import TableFeedback from './components/TableFeedback.vue';
 import { useStore } from './store';
 import { storeToRefs } from 'pinia';
 import VuetifyTable from './components/VuetifyTable.vue';
-
+import VuetifyModal from './components/VuetifyModal.vue';
+import openModal from './components/VuetifyModal.vue';
 const store = useStore()
 
 const { fields, fetchFeedback } = storeToRefs(store)
@@ -51,8 +41,6 @@ const selectedID = ref(null);
 const perPage = ref(30);
 // const currentPage = ref(1);
 const totalRows = ref(null)
-
-
 
 const rows = computed(() => feedbackList.value.length)
 

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="table-container">
         <table class="table">
             <thead>
                 <tr>
@@ -109,11 +109,20 @@ const sortTable = (field) => {
 
 </script>
 <style>
+.table-container {
+    z-index: -1;
+}
 table th,
 td {
     color: white !important;
 }
-
+.avatar {
+    width: 45px;
+    height: 45px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid white;
+}
 .arrow {
     color: gray;
     font-size: 0.75em;

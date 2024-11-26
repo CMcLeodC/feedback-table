@@ -36,6 +36,18 @@
           </BCol>
         </BRow>
       </BContainer>
+      <div class="feedback-table">
+      <Bootstraptable 
+        :feedbackList="feedbackList" 
+        :fields="store.fields"
+        :sortBy="sortBy"
+        :sortDesc="sortDesc"
+        :currentPage="currentPage"
+        :perPage="perPage"
+        :totalRows="totalRows"
+        :handleAvatarUrl="handleAvatarUrl"
+        />
+    </div>
 </template>
 
 <script setup>
@@ -55,3 +67,4 @@ const props = defineProps({
 </script>
 
 <style></style> -->
+

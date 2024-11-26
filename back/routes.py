@@ -102,7 +102,31 @@ def get_dreamers():
 @app.route('/dreamers/<int:id>', methods=['GET'])
 def get_dreamer_by_id(id):
     dreamer = Dreamers.query.get_or_404(id)
-    return jsonify(dreamer.__repr__()), 200
+    return jsonify([{
+    "age": dreamer.age,
+    "avatar": dreamer.avatar,
+    "birthdate": dreamer.birthdate,
+    "coins": dreamer.coins,
+    "created_at": dreamer.created_at,
+    "deleted_at": dreamer.deleted_at,
+    "details": dreamer.details,
+    "game_mode": dreamer.game_mode,
+    "game_reading_level": dreamer.game_reading_level,
+    "gems": dreamer.gems,
+    "id": dreamer.id,
+    "local_flag": dreamer.local_flag,
+    "name": dreamer.name,
+    "password": dreamer.password,
+    "pending_delete": dreamer.pending_delete,
+    "registration_number": dreamer.registration_number,
+    "tale_font_type": dreamer.tale_font_type,
+    "tale_reading_level": dreamer.tale_reading_level,
+    "tale_reading_mode": dreamer.tale_reading_mode,
+    "tutorial_completed": dreamer.tutorial_completed,
+    "updated_at": dreamer.updated_at,
+    "visual_mode": dreamer.visual_mode
+}]
+), 200
 
 @app.route('/users', methods=['GET'])
 def get_users():
