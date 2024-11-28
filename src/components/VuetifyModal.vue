@@ -26,6 +26,10 @@
                 <div>Coins: {{ store.dreamerInfo.coins }}</div>
                 <div>Gems: {{ store.dreamerInfo.gems }}</div>
               </div>
+              <div class="mt-3">
+                <div>User: {{ store.userInfo.name }}</div>
+                <div>User email: {{ store.userInfo.email }}</div>
+              </div>
             </v-card-text>
             <v-card-actions>
               <v-btn color="deep-purple-accent-4" text="Learn More" variant="text"></v-btn>
@@ -34,13 +38,13 @@
         </v-col>
         {{ console.log("hello", store.dreamerInfo.name) }}
         <!-- Card 2 -->
-        <v-col cols="12" md="4">
+        <!-- <v-col cols="12" md="4">
           <v-card class="mx-auto my-12" max-width="374">
             <template v-slot:title>
               Counter
             </template>
 
-            <v-img height="250" src="https://cdn.vuetifyjs.com/images/cards/cooking.png" cover></v-img>
+            <v-img height="250" :src="store.contentArt.thumbnail_url" cover></v-img>
             <v-card-item>
               <v-card-title>Cafe Badilico</v-card-title>
               <v-card-subtitle>
@@ -71,6 +75,37 @@
             </div>
             <v-card-actions>
               <v-btn color="deep-purple-lighten-2" block border></v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-col> -->
+
+        <v-col cols="12" md="4">
+          <v-card class="mx-auto" max-width="344">
+            <template v-slot:title>
+              Player
+            </template>
+            <v-card-text>
+              <v-img height="250" :src="store.contentArt.thumbnail_url" cover></v-img>
+              <div class="text-center text-h5 font-weight-bold">
+                {{ store.moreInfo.content_title }}
+                <v-icon v-if="store.dreamerInfo.local_flag" color="success" icon="mdi-flag" class="ms-2" />
+              </div>
+              <div class="mt-3">
+                <div>
+                  {{  store.moreInfo.content_description }}
+                </div>
+              </div>
+              <div class="mt-3 d-flex justify-space-between">
+                <div>Coins: {{ store.dreamerInfo.coins }}</div>
+                <div>Gems: {{ store.dreamerInfo.gems }}</div>
+              </div>
+              <div class="mt-3">
+                <div>User: {{ store.userInfo.name }}</div>
+                <div>User email: {{ store.userInfo.email }}</div>
+              </div>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn color="deep-purple-accent-4" text="Learn More" variant="text"></v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
@@ -120,9 +155,10 @@ import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 
 const store = useStore();
-const { cards, dreamerInfo } = storeToRefs(store);
+const { cards, dreamerInfo, userInfo, contentArt } = storeToRefs(store);
 
 // const showModal = ref(false);
+console.log(contentArt);
 
 const closeModal = () => {
   store.showModal = false;
@@ -151,7 +187,7 @@ const openModal = () => {
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   padding: 20px;
-  background-color: #2A2A3B; /* Matches odd rows of feedback table */
+  background-color: #2A2A3B;
   color: #FFFFFF;
 }
 
@@ -174,30 +210,39 @@ h1 {
   color: #FFFFFF;
 }
 
-.game-card {
-  background-color: #262637; /* Slightly lighter than modal for subtle contrast */
-  color: #FFFFFF;
-}
-
-.player-card {
-  background-color: #2A2A3B; /* Matches table's odd rows */
-  color: #FFFFFF;
-}
-
-.counter-card {
-  background-color: #1E1E2F; /* Matches table's even rows */
-  color: #FFFFFF;
+.v-col .v-card.player-card, 
+.v-col .v-card.counter-card, 
+.v-col .v-card.game-card {
+  border: 2px solid #3A3A4D; /* Light border for separation */
+  padding: 20px;              /* Add padding for better spacing */
+  border-radius: 10px;        /* Rounded corners */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Subtle shadow for depth */
 }
 
 .v-card {
-  background-color: #2A2A3B !important; /* Slightly darker */
+  background-color: #2A2A3B !important; 
   color: #FFFFFF !important;
-  box-shadow: none !important; /* Optional: to minimize shadow for cleaner look */
-  border-radius: 10px; /* Optional: consistent rounding */
+  box-shadow: none !important;
+  border-radius: 10px; 
+  border: 1px solid #3A3A4D;
+}
+
+.v-col .v-card.player-card {
+  background-color: #2A2A3B; /* Matches table's odd rows */
+}
+
+/* Counter card specific styling */
+.v-col .v-card.counter-card {
+  background-color: #1E1E2F; /* Matches table's even rows */
+}
+
+/* Game card specific styling */
+.v-col .v-card.game-card {
+  background-color: #262637; /* Slightly lighter than modal for contrast */
 }
 
 .v-card-title, .v-card-text {
-  color: #CCCCCC !important; /* Ensures text inside is styled properly */
+  color: #CCCCCC !important;
 }
 
 .v-card-title {

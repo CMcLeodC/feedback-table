@@ -25,6 +25,8 @@ export const useStore = defineStore('storeID', {
     moreInfo: ({}),
     showModal: false,
     dreamerInfo: {},
+    userInfo: {},
+    contentArt: {},
     cards: [
       { title: 'Pre-fab homes', src: 'https://cdn.vuetifyjs.com/images/cards/house.jpg', flex: 4 },
       { title: 'Favorite road trips', src: 'https://cdn.vuetifyjs.com/images/cards/road.jpg', flex: 4 },
@@ -55,6 +57,8 @@ export const useStore = defineStore('storeID', {
         console.log("this.moreInfo: ", this.moreInfo);
         console.log("This particular dreamer_id is: ", data.dreamer_id);
         await this.fetchDreamer(data.dreamer_id);
+        await this.fetchUser(data.user_id);
+        await this.fetchContentArt(data.content_id)
         this.showModal = true;
       } catch (error) {
         console.error('Error:', error);
@@ -68,12 +72,30 @@ export const useStore = defineStore('storeID', {
         const response = await fetch('/api/dreamers/' + id)
         const data = await response.json()
         this.dreamerInfo = data;
-        console.log("This is the dreamer Info: ", this.dreamerInfo);
-        } catch (error) {
-          console.error('Error:', error);
-          this.dreamerInfo = null;
-        };
+      } catch (error) {
+        console.error('Error:', error);
+        this.dreamerInfo = null;
+      };
+    },
+    async fetchUser(id) {
+      try {
+        const response = await fetch('/api/users/' + id)
+        const data = await response.json()
+        this.userInfo = data;
+      } catch (error) {
+        console.error('Error:', error);
+        this.userInfo = null;
+      };
+    },
+    async fetchContentArt(id) {
+      try {
+        const response = await fetch('/api/contents_arts/' + id);
+        const data = await response.json();
+        this.contentArt = data;
+      } catch (error) {
+        console.error('Error:', error);
+        this.userInfo = null;
+      };
     }
-
   }
 })

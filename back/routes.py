@@ -101,7 +101,51 @@ def get_users():
 @app.route('/users/<int:id>', methods=['GET'])
 def get_user_by_id(id):
     user = Users.query.get_or_404(id)
-    return jsonify(user.__repr__()), 200
+    return jsonify({
+        "id": user.id,
+        "name": user.name,
+        "username": user.username,
+        "email": user.email,
+        "is_college": user.is_college,
+        "allowed_access_la": user.allowed_access_la,
+        "validated": user.validated,
+        "teacher_college": user.teacher_college,
+        "is_third_party": user.is_third_party,
+        "max_children": user.max_children,
+        "max_devices": user.max_devices,
+        "details": user.details,
+        "welcomed": user.welcomed,
+        "privacy_accepted": user.privacy_accepted,
+        "lang_id": user.lang_id,
+        "emailing": user.emailing,
+        "zero_emailing": user.zero_emailing,
+        "email1": user.email1,
+        "library_version_id": user.library_version_id,
+        "last_remindered": user.last_remindered,
+        "braintree_id": user.braintree_id,
+        "paypal_email": user.paypal_email,
+        "card_brand": user.card_brand,
+        "card_last_four": user.card_last_four,
+        "trial_ends_at": user.trial_ends_at,
+        "braintree_subscription_id": user.braintree_subscription_id,
+        "web": user.web,
+        "stripe_id": user.stripe_id,
+        "pm_type": user.pm_type,
+        "pm_last_four": user.pm_last_four,
+        "has_child_creation_password": user.has_child_creation_password,
+        "pending_unsubscribe": user.pending_unsubscribe,
+        "pending_delete": user.pending_delete,
+        "sso": user.sso,
+        "sso_provider": user.sso_provider,
+        "sso_provider_uuid": user.sso_provider_uuid,
+        "password": user.password,
+        "remember_token": user.remember_token,
+        "role_id": user.role_id,
+        "created_at": user.created_at,
+        "updated_at": user.updated_at,
+        "deleted_at": user.deleted_at
+    }), 200
+
 
 @app.route('/dreamers_users', methods=['GET'])
 def get_dreamers_users():
@@ -113,19 +157,6 @@ def get_langauges():
     languages = Languages.query.all()
     return jsonify([language.__repr__() for language in languages]), 200
 
-@app.route('/dreamers_users/<int:user_id>', methods=['GET'])
-def get_dreamers_by_user_id(user_id):
-    dreamers_users = Dreamers_Users.query.filter_by(user_id=user_id).all()
-    if not dreamers_users:
-        return jsonify({"message": "No dreamers found for this user"}), 404
-    dreamer_ids = [dreamer_user.dreamer_id for dreamer_user in dreamers_users]
-    return jsonify(dreamer_ids), 200
-
-
-# @app.route('/feedback', methods=['GET'])
-# def get_feedback():
-#     feedbacks = Feedback.query.limit(30).all()
-#     return jsonify([feedback.serialize() for feedback in feedbacks]), 200
 
 @app.route('/feedback', methods=['GET'])
 def get_feedback():

@@ -57,7 +57,7 @@
                     <td>{{ item.duration }}</td>
                     <td>{{ item.score }}</td>
                     <td>
-                        <button @click="store.openModalWithID(item.id)">Action</button>
+                        <button class="action-btn" @click="store.openModalWithID(item.id)">More Info</button>
                     </td>
                 </tr>
             </tbody>
@@ -174,5 +174,30 @@ td {
     font-size: 14px;
     font-weight: bold;
     color: #FFFFFF;
+}
+
+.action-btn {
+  padding: 6px 12px;
+  background-color: #FF6B6B;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+}
+
+.action-btn:hover {
+  background-color: #FF3D3D;
+  transform: scale(1.05);
+}
+
+.action-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 87, 34, 0.4);
+}
+
+.action-btn:active {
+  background-color: #FF2A2A;
 }
 </style>
