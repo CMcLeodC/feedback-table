@@ -32,6 +32,20 @@ class Contents(db.Model):
     def __repr__(self):
         return f'<Contents id={self.id}, identifier={self.identifier}>'
 
+class ContentsArts(db.Model):
+    __tablename__ = 'contents_arts'
+
+    content_id = db.Column(db.Integer, db.ForeignKey('contents.id'), primary_key=True)
+    icon_url = db.Column(db.String(255))
+    thumbnail_url = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+
+    content = db.relationship('Contents', backref='arts')
+
+    def __repr__(self):
+        return f"<ContentsArts content_id={self.content_id}, icon_url={self.icon_url}, thumbnail_url={self.thumbnail_url}>"
+
 class Levels(db.Model):
     __tablename__ = 'levels'
 

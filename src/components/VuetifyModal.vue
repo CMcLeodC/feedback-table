@@ -11,12 +11,20 @@
               Player
             </template>
             <v-card-text>
-              <div>name: {{ store.dreamerInfo.name }}</div>
-              <p class="text-h4 font-weight-black">be•nev•o•lent</p>
-              <p>adjective</p>
-              <div class="text-medium-emphasis">
-                well meaning and kindly.<br />
-                "a benevolent smile"
+              <v-avatar size="100" class="mx-auto mb-4">
+                <v-img :src="store.handleAvatarUrl(store.dreamerInfo.avatar)" alt="Player Avatar" />
+              </v-avatar>
+              <div class="text-center text-h5 font-weight-bold">
+                {{ store.dreamerInfo.name }}
+                <v-icon v-if="store.dreamerInfo.local_flag" color="success" icon="mdi-flag" class="ms-2" />
+              </div>
+              <div class="mt-3">
+                <div>Birthdate: {{ new Date(store.dreamerInfo.birthdate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) }}</div>
+                <div>Age: {{ store.dreamerInfo.age }}</div>
+              </div>
+              <div class="mt-3 d-flex justify-space-between">
+                <div>Coins: {{ store.dreamerInfo.coins }}</div>
+                <div>Gems: {{ store.dreamerInfo.gems }}</div>
               </div>
             </v-card-text>
             <v-card-actions>
@@ -24,7 +32,7 @@
             </v-card-actions>
           </v-card>
         </v-col>
-
+        {{ console.log("hello", store.dreamerInfo.name) }}
         <!-- Card 2 -->
         <v-col cols="12" md="4">
           <v-card class="mx-auto my-12" max-width="374">
@@ -42,14 +50,8 @@
             </v-card-item>
             <v-card-text>
               <v-row align="center" class="mx-0">
-                <v-rating
-                  :model-value="4.5"
-                  color="amber"
-                  density="compact"
-                  size="small"
-                  half-increments
-                  readonly
-                ></v-rating>
+                <v-rating :model-value="4.5" color="amber" density="compact" size="small" half-increments
+                  readonly></v-rating>
                 <div class="text-grey ms-4">4.5 (413)</div>
               </v-row>
               <div class="my-4 text-subtitle-1">$ • Italian, Cafe</div>
@@ -68,79 +70,42 @@
               </v-chip-group>
             </div>
             <v-card-actions>
-              <v-btn
-                color="deep-purple-lighten-2"
-                block
-                border
-              ></v-btn>
+              <v-btn color="deep-purple-lighten-2" block border></v-btn>
             </v-card-actions>
           </v-card>
         </v-col>
 
         <!-- Card 3 -->
         <v-col cols="12" md="4">
-          <v-card class="mx-auto" max-width="400">
-            <v-layout>
-              
-              <v-main>
-                <v-container>
-                  <v-row dense>
-                    <v-col cols="12">
-                      
-                      <v-card color="#385F73">
-                        <template v-slot:title>
-              Counter
+          <v-card class="mx-auto game-card" max-width="344">
+            <template v-slot:title>
+              Game
             </template>
-                        <v-card-title class="text-h5">Unlimited music now</v-card-title>
-                        <v-card-subtitle>
-                          Listen to your favorite artists and albums whenever and wherever, online and offline.
-                        </v-card-subtitle>
-                        <v-card-actions>
-                          <v-btn text="Listen Now" variant="text"></v-btn>
-                        </v-card-actions>
-                      </v-card>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-card color="#1F7087">
-                        <div class="d-flex flex-no-wrap justify-space-between">
-                          <div>
-                            <v-card-title class="text-h5">Supermodel</v-card-title>
-                            <v-card-subtitle>Foster the People</v-card-subtitle>
-                            <v-card-actions>
-                              <v-btn
-                                class="ms-2"
-                                size="small"
-                                text="START RADIO"
-                                variant="outlined"
-                              ></v-btn>
-                            </v-card-actions>
-                          </div>
-                          <v-avatar class="ma-3" rounded="0" size="125">
-                            <v-img src="https://cdn.vuetifyjs.com/images/cards/foster.jpg"></v-img>
-                          </v-avatar>
-                        </div>
-                      </v-card>
-                    </v-col>
-                    <v-col cols="12">
-                      <v-card color="#952175">
-                        <div class="d-flex flex-no-wrap justify-space-between">
-                          <div>
-                            <v-card-title class="text-h5">Halcyon Days</v-card-title>
-                            <v-card-subtitle>Ellie Goulding</v-card-subtitle>
-                            <v-card-actions>
-                              <v-btn class="ms-2" icon="mdi-play" variant="text"></v-btn>
-                            </v-card-actions>
-                          </div>
-                          <v-avatar class="ma-3" rounded="0" size="125">
-                            <v-img src="https://cdn.vuetifyjs.com/images/cards/halcyon.png"></v-img>
-                          </v-avatar>
-                        </div>
-                      </v-card>
-                    </v-col>
-                  </v-row>
-                </v-container>
-              </v-main>
-            </v-layout>
+            <v-card-text>
+              <!-- Language Info: Flag and Name -->
+              <div class="d-flex align-items-center mb-3">
+                <v-avatar size="32" class="me-2">
+                  <v-img :src="`/path/to/flags/${store.moreInfo.lang_id}.png`" alt="Language Flag" />
+                </v-avatar>
+                <span class="text-h5">{{ store.moreInfo.lang_local_name }}</span>
+              </div>
+
+              <!-- Completed Status -->
+              <div class="d-flex align-items-center mb-3">
+                <v-icon v-if="store.moreInfo.completed" color="success" size="32" class="me-2">mdi-check-circle</v-icon>
+                <v-icon v-else color="grey" size="32" class="me-2">mdi-circle-outline</v-icon>
+                <span class="text-h6">Completed</span>
+              </div>
+
+              <!-- Time and Score -->
+              <div class="mt-3">
+                <div>Time: {{ store.moreInfo.time }}</div>
+                <div>Score: {{ store.moreInfo.score }}</div>
+              </div>
+            </v-card-text>
+            <v-card-actions>
+              <v-btn color="deep-purple-accent-4" text="More Info" variant="text"></v-btn>
+            </v-card-actions>
           </v-card>
         </v-col>
       </v-row>
@@ -186,13 +151,76 @@ const openModal = () => {
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   padding: 20px;
+  background-color: #2A2A3B; /* Matches odd rows of feedback table */
   color: #FFFFFF;
 }
 
 .vuetify-modal-container.v-card {
+  background-color: #2A2A3B !important; /* Ensures consistency if card styles override */
   position: fixed !important;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+h1 {
+  color: #FFFFFF;
+}
+
+.app-container {
+  font-family: sans-serif;
+  font-size: 14px;
+  background-color: #1E1E2F;
+  color: #FFFFFF;
+}
+
+.game-card {
+  background-color: #262637; /* Slightly lighter than modal for subtle contrast */
+  color: #FFFFFF;
+}
+
+.player-card {
+  background-color: #2A2A3B; /* Matches table's odd rows */
+  color: #FFFFFF;
+}
+
+.counter-card {
+  background-color: #1E1E2F; /* Matches table's even rows */
+  color: #FFFFFF;
+}
+
+.v-card {
+  background-color: #2A2A3B !important; /* Slightly darker */
+  color: #FFFFFF !important;
+  box-shadow: none !important; /* Optional: to minimize shadow for cleaner look */
+  border-radius: 10px; /* Optional: consistent rounding */
+}
+
+.v-card-title, .v-card-text {
+  color: #CCCCCC !important; /* Ensures text inside is styled properly */
+}
+
+.v-card-title {
+  color: #FFFFFF;
+}
+
+.v-card-text div {
+  margin-bottom: 10px;
+  color: #CCCCCC;
+}
+
+.v-btn {
+  background-color: #333344; /* Button background inside modal */
+  color: #FFFFFF;
+  border: none;
+}
+
+.v-btn:hover {
+  background-color: #444455; /* Subtle hover effect for buttons */
+  transition: background-color 0.2s ease;
+}
+
+.v-icon {
+  vertical-align: middle;
 }
 </style>
