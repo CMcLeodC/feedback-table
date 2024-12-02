@@ -6,9 +6,9 @@
       <v-row dense justify="space-between">
         <!-- Card 1 -->
         <v-col cols="12" md="4">
-          <v-card class="mx-auto" max-width="344">
+          <v-card class="player-card mx-auto" max-width="344">
             <template v-slot:title>
-              Player
+              <h1 class="modal-header">Player</h1>
             </template>
             <v-card-text>
               <v-avatar size="100" class="mx-auto mb-4">
@@ -16,8 +16,11 @@
               </v-avatar>
               <div class="text-center text-h5 font-weight-bold">
                 {{ store.dreamerInfo.name }}
-                <v-icon v-if="store.dreamerInfo.local_flag" color="success" icon="mdi-flag" class="ms-2" />
+                <div class="flag-container">
+                  <v-img :src="`/assets/flag${store.moreInfo.lang_id}.png`" class="flag-image" alt="Language Flag" />
+                </div>
               </div>
+
               <div class="mt-3">
                 <div>Birthdate: {{ new Date(store.dreamerInfo.birthdate).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) }}</div>
                 <div>Age: {{ store.dreamerInfo.age }}</div>
@@ -27,8 +30,15 @@
                 <div>Gems: {{ store.dreamerInfo.gems }}</div>
               </div>
               <div class="mt-3">
-                <div>User: {{ store.userInfo.name }}</div>
-                <div>User email: {{ store.userInfo.email }}</div>
+                <div class="user-info-box">
+                  <div class="user-info-header">
+                    <span>User Info</span>
+                  </div>
+                  <div class="user-info-content">
+                    <div>{{ store.userInfo.name }}</div>
+                    <div>{{ store.userInfo.email }}</div>
+                  </div>
+                </div>
               </div>
             </v-card-text>
             <v-card-actions>
@@ -38,70 +48,21 @@
         </v-col>
         {{ console.log("hello", store.dreamerInfo.name) }}
         <!-- Card 2 -->
-        <!-- <v-col cols="12" md="4">
-          <v-card class="mx-auto my-12" max-width="374">
-            <template v-slot:title>
-              Counter
-            </template>
-
-            <v-img height="250" :src="store.contentArt.thumbnail_url" cover></v-img>
-            <v-card-item>
-              <v-card-title>Cafe Badilico</v-card-title>
-              <v-card-subtitle>
-                <span class="me-1">Local Favorite</span>
-                <v-icon color="error" icon="mdi-fire-circle" size="small"></v-icon>
-              </v-card-subtitle>
-            </v-card-item>
-            <v-card-text>
-              <v-row align="center" class="mx-0">
-                <v-rating :model-value="4.5" color="amber" density="compact" size="small" half-increments
-                  readonly></v-rating>
-                <div class="text-grey ms-4">4.5 (413)</div>
-              </v-row>
-              <div class="my-4 text-subtitle-1">$ • Italian, Cafe</div>
-              <div>
-                Small plates, salads & sandwiches - an intimate setting with 12 indoor seats plus patio seating.
-              </div>
-            </v-card-text>
-            <v-divider class="mx-4 mb-1"></v-divider>
-            <v-card-title>Tonight's availability</v-card-title>
-            <div class="px-4 mb-2">
-              <v-chip-group selected-class="bg-deep-purple-lighten-2">
-                <v-chip>5:30PM</v-chip>
-                <v-chip>7:30PM</v-chip>
-                <v-chip>8:00PM</v-chip>
-                <v-chip>9:00PM</v-chip>
-              </v-chip-group>
-            </div>
-            <v-card-actions>
-              <v-btn color="deep-purple-lighten-2" block border></v-btn>
-            </v-card-actions>
-          </v-card>
-        </v-col> -->
 
         <v-col cols="12" md="4">
-          <v-card class="mx-auto" max-width="344">
+          <v-card class="counter-card mx-auto" max-width="344">
             <template v-slot:title>
-              Player
+              <h1 class="modal-header">Counter</h1>
             </template>
             <v-card-text>
-              <v-img height="250" :src="store.contentArt.thumbnail_url" cover></v-img>
+              <v-img class="thumbnail-art" height="200" :src="store.contentArt.thumbnail_url" cover></v-img>
               <div class="text-center text-h5 font-weight-bold">
                 {{ store.moreInfo.content_title }}
-                <v-icon v-if="store.dreamerInfo.local_flag" color="success" icon="mdi-flag" class="ms-2" />
               </div>
               <div class="mt-3">
                 <div>
                   {{  store.moreInfo.content_description }}
                 </div>
-              </div>
-              <div class="mt-3 d-flex justify-space-between">
-                <div>Coins: {{ store.dreamerInfo.coins }}</div>
-                <div>Gems: {{ store.dreamerInfo.gems }}</div>
-              </div>
-              <div class="mt-3">
-                <div>User: {{ store.userInfo.name }}</div>
-                <div>User email: {{ store.userInfo.email }}</div>
               </div>
             </v-card-text>
             <v-card-actions>
@@ -112,30 +73,40 @@
 
         <!-- Card 3 -->
         <v-col cols="12" md="4">
-          <v-card class="mx-auto game-card" max-width="344">
+          <v-card class="game-card mx-auto" max-width="344">
             <template v-slot:title>
-              Game
+              <h1 class="modal-header">Game</h1>
             </template>
             <v-card-text>
-              <!-- Language Info: Flag and Name -->
               <div class="d-flex align-items-center mb-3">
-                <v-avatar size="32" class="me-2">
-                  <v-img :src="`/path/to/flags/${store.moreInfo.lang_id}.png`" alt="Language Flag" />
-                </v-avatar>
+                <div class="flag-container">
+                  <v-img :src="`/assets/flag${store.moreInfo.lang_id}.png`" class="flag-image" alt="Language Flag" />
+                </div>
                 <span class="text-h5">{{ store.moreInfo.lang_local_name }}</span>
               </div>
 
               <!-- Completed Status -->
-              <div class="d-flex align-items-center mb-3">
-                <v-icon v-if="store.moreInfo.completed" color="success" size="32" class="me-2">mdi-check-circle</v-icon>
-                <v-icon v-else color="grey" size="32" class="me-2">mdi-circle-outline</v-icon>
-                <span class="text-h6">Completed</span>
-              </div>
+              <template>
+                <div class="d-flex align-items-center mb-3">
+                  <div v-if="store.moreInfo.completed" class="tick-container me-2">
+                    <img 
+                      src="/assets/check-tick-mark-in-green-circle.jpg" 
+                      alt="Success Tick" 
+                      class="tick-icon"
+                    />
+                  </div>
+                  <span class="text-h6">Completed</span>
+                </div>
+              </template>
+
 
               <!-- Time and Score -->
               <div class="mt-3">
-                <div>Time: {{ store.moreInfo.time }}</div>
-                <div>Score: {{ store.moreInfo.score }}</div>
+                <div>Time: {{ store.moreInfo.duration }}</div>
+                <div>Score: {{ store.moreInfo.score }} / {{ store.moreInfo.total_score }}</div>
+                <div>Cat: {{ store.moreInfo.category_id }}</div>
+                <div>Type: {{ store.moreInfo.type_name }}</div>
+                <div>Details: {{ store.moreInfo.details }}</div>
               </div>
             </v-card-text>
             <v-card-actions>
@@ -156,7 +127,6 @@ import { ref } from 'vue';
 
 const store = useStore();
 const { cards, dreamerInfo, userInfo, contentArt } = storeToRefs(store);
-
 // const showModal = ref(false);
 console.log(contentArt);
 
@@ -167,9 +137,10 @@ const closeModal = () => {
 const openModal = () => {
   store.showModal = true;
 };
+
 </script>
 
-<style>
+<style scoped>
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -187,16 +158,29 @@ const openModal = () => {
   border-radius: 10px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   padding: 20px;
-  background-color: #2A2A3B;
+  background-color: #2A2A3B !important;
   color: #FFFFFF;
+  max-height: 80vh; 
+  overflow-y: auto;
 }
 
 .vuetify-modal-container.v-card {
-  background-color: #2A2A3B !important; /* Ensures consistency if card styles override */
+  background-color: #2A2A3B !important; 
   position: fixed !important;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+}
+
+.modal-header {
+  color: #FFD700; /* Golden color for better contrast */
+  font-size: 24px; /* Bigger font size */
+  font-weight: bold; /* Emphasize header weight */
+  text-align: center; /* Center alignment for importance */
+  margin-bottom: 20px; /* Space below header */
+  text-transform: uppercase; /* Make text uppercase for a header-like feel */
+  border-bottom: 2px solid #FFD700; /* Divider below the header */
+  padding-bottom: 10px; /* Spacing to separate text from border */
 }
 
 h1 {
@@ -210,13 +194,15 @@ h1 {
   color: #FFFFFF;
 }
 
-.v-col .v-card.player-card, 
-.v-col .v-card.counter-card, 
-.v-col .v-card.game-card {
-  border: 2px solid #3A3A4D; /* Light border for separation */
-  padding: 20px;              /* Add padding for better spacing */
-  border-radius: 10px;        /* Rounded corners */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);  /* Subtle shadow for depth */
+.v-card.player-card, 
+.v-card.counter-card, 
+.v-card.game-card {
+  background-color: #2A2A3B !important; 
+  color: #FFFFFF !important;
+  border: 2px solid #3A3A4D;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  padding: 20px;
 }
 
 .v-card {
@@ -231,21 +217,53 @@ h1 {
   background-color: #2A2A3B; /* Matches table's odd rows */
 }
 
-/* Counter card specific styling */
 .v-col .v-card.counter-card {
   background-color: #1E1E2F; /* Matches table's even rows */
 }
 
-/* Game card specific styling */
 .v-col .v-card.game-card {
-  background-color: #262637; /* Slightly lighter than modal for contrast */
+  background-color: #2E2E44; /* Slightly lighter for better contrast */
+  border: 2px solid #4B4B63;
+  border-radius: 10px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  padding: 20px;
 }
+
+.v-col .v-card.game-card .v-card-title {
+  color: #FFFFFF;
+  font-weight: bold;
+  font-size: 22px;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+.v-col .v-card.game-card .v-card-text div {
+  color: #B0B0C3;
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.v-col .v-card.game-card .v-btn {
+  background-color: #6A6AFF;
+  color: #FFFFFF;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+.v-col .v-card.game-card .v-btn:hover {
+  background-color: #8080FF;
+}
+
 
 .v-card-title, .v-card-text {
   color: #CCCCCC !important;
 }
 
 .v-card-title {
+  font-size: 28px !important;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
   color: #FFFFFF;
 }
 
@@ -255,17 +273,84 @@ h1 {
 }
 
 .v-btn {
-  background-color: #333344; /* Button background inside modal */
+  background-color: #333344;
   color: #FFFFFF;
   border: none;
 }
 
 .v-btn:hover {
-  background-color: #444455; /* Subtle hover effect for buttons */
+  background-color: #444455;
   transition: background-color 0.2s ease;
 }
 
 .v-icon {
   vertical-align: middle;
+}
+
+.thumbnail-art {
+  margin-top: -10px;
+  margin-bottom: -30px;
+}
+
+.v-avatar {
+  display: flex !important;
+  justify-content: center !important;
+  margin: 0 auto !important;
+  align-items: center !important;
+  border: 2px solid white !important;
+}
+
+.v-col {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.flag-container {
+  width: 60px;
+  height: 40px;
+  display: inline-block;
+  overflow: hidden;
+  border-radius: 4px;
+}
+
+.flag-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.tick-container {
+  display: flex;
+  align-items: center; /* Center image vertically */
+  justify-content: center; /* Center image horizontally */
+}
+
+.tick-icon {
+  width: 32px; /* Set width */
+  height: 32px; /* Set height */
+  object-fit: contain; /* Ensure the image scales without distortion */
+}
+
+.user-info-box {
+  background-color: #2A2A3B;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.user-info-header {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #FF6B6B;
+  margin-bottom: 10px;
+}
+
+.user-info-content {
+  font-size: 1rem;
+  color: #FFFFFF;
 }
 </style>

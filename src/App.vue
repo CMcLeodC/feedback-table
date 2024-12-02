@@ -3,11 +3,12 @@
     <h1>Feedback</h1>
     <!-- <VuetifyTable /> -->
     <div class="input-field">
-      <input type="search" v-model="filterValue" id="search-bar" placeholder="Search feedback..."
-        @keyup.enter="fetchFeedback">
-      {{ console.log(filterValue) }}
+      <input type="search" v-model="store.filterValue" id="search-bar" placeholder="Search feedback..."
+        @keyup.enter="store.fetchFeedback">
+      {{ console.log(store.filterValue) }}
     </div>
-    {{console.log(sortBy)}}
+    
+    <AdvancedFilter />
 
     <TableFeedback :feedbackList="feedbackList" :fields="store.fields" :sortBy="sortBy" :sortDesc="sortDesc" />
 
@@ -27,9 +28,10 @@ import { storeToRefs } from 'pinia';
 import VuetifyTable from './components/VuetifyTable.vue';
 import VuetifyModal from './components/VuetifyModal.vue';
 import openModal from './components/VuetifyModal.vue';
+import AdvancedFilter from './components/AdvancedFilter.vue';
 const store = useStore()
 
-const { fields, fetchFeedback } = storeToRefs(store)
+const { fields, fetchFeedback, } = storeToRefs(store)
 
 const isModalOpen = ref(false);
 const filterValue = ref("");
@@ -44,40 +46,13 @@ const totalRows = ref(null)
 
 const rows = computed(() => feedbackList.value.length)
 
-
-// const openModalWithID = (id) => {
-//   selectedID.value = id
-//   fetch('/api/feedback/' + id)
-//     .then((response) => response.json())
-//     .then((data) => {
-//       moreInfo.value = data;
-//     })
-//     .catch((error) => {
-//       console.error('Error:', error);
-//     });
-// }
-
-// const fetchFeedback = () => {
-//   fetch(`/api/feedback?filter=${filterValue.value}&sort=${sortBy.value}&desc=${sortDesc.value}&page=${currentPage.value}&per_page=${perPage.value}`)
-//     .then((response) => response.json())
-//     .then((data) => {
-//       totalRows.value = data.total
-//       feedbackList.value = data.data
-//       console.log("data.total is: ", data.total)
-//       console.log("Feedback list: ", feedbackList.value);
-//     })
-//     .catch((error) => {
-//       console.error('Error:', error);
-//     });
-// };
-
 onMounted(() => {
   store.fetchFeedback();
 });
 
 </script>
 
-<style>
+<style scoped>
 h1 {
   color: #FFFFFF;
 }

@@ -55,7 +55,7 @@
                     <td>{{ item.content_title }}</td>
                     <td>{{ item.level_name }}</td>
                     <td>{{ item.duration }}</td>
-                    <td>{{ item.score }}</td>
+                    <td>{{ item.score }} / {{ item.total_score }}</td>
                     <td>
                         <button class="action-btn" @click="store.openModalWithID(item.id)">More Info</button>
                     </td>

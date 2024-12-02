@@ -46,6 +46,19 @@ class ContentsArts(db.Model):
     def __repr__(self):
         return f"<ContentsArts content_id={self.content_id}, icon_url={self.icon_url}, thumbnail_url={self.thumbnail_url}>"
 
+class ContentsFeedbackCategories(db.Model):
+    __tablename__ = 'contents_feedback_categories'
+
+    content_id = db.Column(db.Integer, db.ForeignKey('contents.id'), primary_key=True) 
+    category_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+
+    def __repr__(self):
+        return f"<ContentsArts content_id={self.content_id}, category_id={self.category_id}, name={self.name}>"
+
+
 class Levels(db.Model):
     __tablename__ = 'levels'
 
@@ -182,6 +195,15 @@ class Languages(db.Model):
         return f'<Languages id={self.id}, name={self.name}>'
 
 
+class Feedback_Types(db.Model):
+    __tablename__ = 'feedback_types'
+
+    id = db.Column(db.Integer, primary_key=True)
+    feedback_type = db.Column(db.String(255))
+
+    def __repr__(self):
+        return f'<Languages id={self.id}, name={self.feedback_type}>'
+
 class Feedback(db.Model):
     __tablename__ = 'feedback'
 
@@ -191,7 +213,7 @@ class Feedback(db.Model):
     content_id = db.Column(db.Integer, db.ForeignKey('contents.id'))
     library_version_id = db.Column(db.Integer)
     lang_id = db.Column(db.Integer, db.ForeignKey('languages.id'))
-    type_id = db.Column(db.Integer)
+    type_id = db.Column(db.Integer, db.ForeignKey('feedback_types.id'))
     game_mode_id = db.Column(db.Integer)
     reading_mode_id = db.Column(db.Integer)
     quiz_mode_id = db.Column(db.Integer)
@@ -215,6 +237,7 @@ class Feedback(db.Model):
     content = db.relationship('Contents', backref='feedbacks')
     level = db.relationship('Levels', backref='feedbacks')
     language = db.relationship('Languages', backref='feedbacks')
+    types = db.relationship('Feedback_Types', backref='feedbacks')
 
     content_data = db.relationship(
         'Contents_Marketplace',

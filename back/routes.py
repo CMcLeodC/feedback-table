@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from models import db, Contents, Dreamers, Users, Levels, Feedback, Dreamers_Users, Contents_Marketplace, Languages, ContentsArts
+from models import db, Contents, Dreamers, Users, Levels, Feedback, Dreamers_Users, Contents_Marketplace, Languages, ContentsArts, ContentsFeedbackCategories, Feedback_Types
 from dotenv import load_dotenv
 from sqlalchemy import text, func, and_
 from sqlalchemy.orm import joinedload, aliased
@@ -48,6 +48,31 @@ def get_content_art_by_id(content_id):
         'updated_at': art.updated_at
     }), 200
 
+@app.route('/contents_feedback_categories', methods=['GET'])
+def get_contents_feedbacks_categories():
+    categories = ContentsFeedbackCategories.query.all()
+    return jsonify([{
+        'content_id': category.content_id,
+        'category_id': category.category_id,
+        'name': category.name,
+        'created_at': category.created_at,
+        'updated_at': category.updated_at
+    } for category in categories]), 200
+
+@app.route('/contents_feedback_categories/<int:content_id>/<int:category_id>', methods=['GET'])
+def get_content_feedback_category_by_id(content_id, category_id):
+    category = ContentsFeedbackCategories.query.filter_by(content_id=content_id, category_id=category_id).first()
+    
+    if not category:
+        return jsonify({"error": "Category not found"}), 404
+    
+    return jsonify({
+        'content_id': category.content_id,
+        'category_id': category.category_id,
+        'name': category.name,
+        'created_at': category.created_at,
+        'updated_at': category.updated_at
+    }), 200
 
 @app.route('/levels', methods=['GET'])
 def get_levels():
@@ -157,6 +182,10 @@ def get_langauges():
     languages = Languages.query.all()
     return jsonify([language.__repr__() for language in languages]), 200
 
+@app.route('/feedback_types', methods=['GET'])
+def get_feedback_types():
+    types = Feedback_Types.query.all()
+    return jsonify([type.__repr__() for type in types]), 200
 
 @app.route('/feedback', methods=['GET'])
 def get_feedback():
@@ -220,6 +249,7 @@ def get_feedback():
         Feedback.library_version_id,
         Languages.local_name.label("lang_local_name"),
         Feedback.lang_id,
+        Feedback_Types.feedback_type.label("type_name"),
         Feedback.type_id,
         Feedback.game_mode_id,
         Feedback.reading_mode_id,
@@ -244,17 +274,15 @@ def get_feedback():
     .join(Contents, Feedback.content_id == Contents.id)\
     .join(Levels, Feedback.level_id == Levels.id)\
     .join(Languages, Feedback.lang_id == Languages.id)\
-    # .join(Contents_Marketplace,
-    #       and_(Feedback.content_id == Contents_Marketplace.content_id,
-    #            Feedback.lang_id == Contents_Marketplace.lang_id))
-
+    .join(Feedback_Types, Feedback.type_id == Feedback_Types.id)
         
     
     if filter_value:
-        filter_pattern = f"{filter_value}%"
+        filter_pattern = f"%{filter_value}%"
         query = query.filter(
-            (Users.name.like(filter_pattern)) |
-            (Dreamers.name.like(filter_pattern))
+            (Users.name.ilike(filter_pattern)) |
+            (Dreamers.name.ilike(filter_pattern)) |
+            (title_subquery.ilike(filter_pattern))
         )
 
     if sort_field in sortable_fields:
@@ -281,6 +309,7 @@ def get_feedback():
         'library_version_id': feedback.library_version_id,
         'lang_local_name': feedback.lang_local_name,
         'lang_id': feedback.lang_id,
+        'type_name': feedback.type_name,
         'type_id': feedback.type_id,
         'game_mode_id': feedback.game_mode_id,
         'reading_mode_id': feedback.reading_mode_id,
@@ -314,24 +343,57 @@ def get_feedback():
 
 @app.route('/feedback/<int:id>', methods=['GET'])
 def get_specific_feedback(id):
+    # Creating an alias for Contents_Marketplace
     ContentMarketplaceAlias = aliased(Contents_Marketplace)
 
-    feedback = db.session.query(Feedback, Dreamers, Users, Contents, Levels, ContentMarketplaceAlias, Languages) \
-        .join(Dreamers, Feedback.dreamer_id == Dreamers.id) \
-        .join(Users, Feedback.user_id == Users.id) \
-        .join(Contents, Feedback.content_id == Contents.id) \
-        .join(Levels, Feedback.level_id == Levels.id) \
-        .join(Languages, Feedback.lang_id == Languages.id) \
-        .join(ContentMarketplaceAlias,
-              and_(Feedback.content_id == ContentMarketplaceAlias.content_id,
-                   Feedback.lang_id == ContentMarketplaceAlias.lang_id)) \
-        .filter(ContentMarketplaceAlias.key == 'title', Feedback.id == id) \
-        .first()
+    # Define subqueries for title, description, and keywords
+    title_subquery = db.session.query(Contents_Marketplace.value).filter(
+        and_(
+            Feedback.content_id == Contents_Marketplace.content_id,
+            Feedback.lang_id == Contents_Marketplace.lang_id,
+            Contents_Marketplace.key == 'title'
+        )
+    ).correlate(Feedback).scalar_subquery()
 
-    if not feedback:
+    description_subquery = db.session.query(Contents_Marketplace.value).filter(
+        and_(
+            Feedback.content_id == Contents_Marketplace.content_id,
+            Feedback.lang_id == Contents_Marketplace.lang_id,
+            Contents_Marketplace.key == 'description'
+        )
+    ).correlate(Feedback).scalar_subquery()
+
+    keywords_subquery = db.session.query(Contents_Marketplace.value).filter(
+        and_(
+            Feedback.content_id == Contents_Marketplace.content_id,
+            Feedback.lang_id == Contents_Marketplace.lang_id,
+            Contents_Marketplace.key == 'keywords'
+        )
+    ).correlate(Feedback).scalar_subquery()
+
+    feedback_data = db.session.query(
+    Feedback, Dreamers, Users, Contents, Levels, ContentMarketplaceAlias, Languages, Feedback_Types,
+    title_subquery.label('content_title'),
+    description_subquery.label('content_description'),
+    keywords_subquery.label('content_keywords')
+) \
+    .join(Dreamers, Feedback.dreamer_id == Dreamers.id) \
+    .join(Users, Feedback.user_id == Users.id) \
+    .join(Contents, Feedback.content_id == Contents.id) \
+    .join(Levels, Feedback.level_id == Levels.id) \
+    .join(Languages, Feedback.lang_id == Languages.id) \
+    .join(Feedback_Types, Feedback.type_id == Feedback_Types.id) \
+    .join(ContentMarketplaceAlias,
+          and_(Feedback.content_id == ContentMarketplaceAlias.content_id,
+               Feedback.lang_id == ContentMarketplaceAlias.lang_id)) \
+    .filter(Feedback.id == id) \
+    .first()
+
+    if not feedback_data:
         return jsonify({"error": "Feedback not found"}), 404
 
-    feedback, dreamer, user, content, level, content_marketplace, language = feedback
+    # Unpack the results into the appropriate variables
+    feedback, dreamer, user, content, level, content_marketplace, language, feedback_type, content_title, content_description, content_keywords = feedback_data
 
     return jsonify({
         'id': feedback.id,
@@ -342,11 +404,13 @@ def get_specific_feedback(id):
         'dreamer_avatar': dreamer.avatar if dreamer else None,
         'content_id': feedback.content_id,
         'content_identifier': content.identifier if content else None,
-        'content_title': content_marketplace.value.strip('"') if content_marketplace else None,
-        'content_data': [content.value.strip('"') for content in feedback.content_data] if feedback.content_data else None,
+        'content_title': content_title.strip('"') if content_title else None,
+        'content_description': content_description.strip('"') if content_description else None,
+        'content_keywords': content_keywords.strip('"') if content_keywords else None,
         'library_version_id': feedback.library_version_id,
         'lang_local_name': language.local_name if language else None,
         'lang_id': feedback.lang_id,
+        'type_name': feedback_type.feedback_type if feedback_type else None,
         'type_id': feedback.type_id,
         'game_mode_id': feedback.game_mode_id,
         'reading_mode_id': feedback.reading_mode_id,
@@ -367,6 +431,8 @@ def get_specific_feedback(id):
         'created_at': feedback.created_at.strftime('%d/%m/%y %H:%M:%S') if feedback.created_at else None,
         'updated_at': feedback.updated_at.strftime('%d/%m/%y %H:%M:%S') if feedback.updated_at else None,
     }), 200
+
+
 
 @app.route('/back/images/dreamer_avatars/<filename>', methods=['GET'])
 def get_dreamer_avatar(filename):
