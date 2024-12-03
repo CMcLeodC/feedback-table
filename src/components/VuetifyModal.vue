@@ -104,7 +104,8 @@
               <div class="mt-3">
                 <div>Time: {{ store.moreInfo.duration }}</div>
                 <div>Score: {{ store.moreInfo.score }} / {{ store.moreInfo.total_score }}</div>
-                <div>Cat: {{ store.moreInfo.category_id }}</div>
+                <div>Cat: {{ store.moreInfo.category_name }}</div>
+                <div>Sub-Cat: {{ store.moreInfo.subcategory_name }}</div>
                 <div>Type: {{ store.moreInfo.type_name }}</div>
                 <div>Details: {{ store.moreInfo.details }}</div>
               </div>

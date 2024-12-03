@@ -27,20 +27,9 @@ export const useStore = defineStore('storeID', {
     dreamerInfo: {},
     userInfo: {},
     contentArt: {},
-    cards: [
-      { title: 'Pre-fab homes', src: 'https://cdn.vuetifyjs.com/images/cards/house.jpg', flex: 4 },
-      { title: 'Favorite road trips', src: 'https://cdn.vuetifyjs.com/images/cards/road.jpg', flex: 4 },
-      { title: 'Best airlines', src: 'https://cdn.vuetifyjs.com/images/cards/plane.jpg', flex: 4 },
-    ],
-    itemTitle: "London",
-    selectPlace: { state: 'Florida', abbr: 'FL' },
-    items: [
-      { state: 'Florida', abbr: 'FL' },
-      { state: 'Georgia', abbr: 'GA' },
-      { state: 'Nebraska', abbr: 'NE' },
-      { state: 'California', abbr: 'CA' },
-      { state: 'New York', abbr: 'NY' },
-    ],
+    items: ['Englisn', 'Spanish', 'French', 'Catalan'],
+    value: ['Portuguese', 'Italian', 'Turkish', 'Latam'],
+    types: ['Game', 'Tale', 'Quiz', 'Theory', 'Video', 'Audiobook', 'PDF']
   }),
   actions: {
     async fetchFeedback() {

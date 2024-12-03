@@ -58,6 +58,18 @@ class ContentsFeedbackCategories(db.Model):
     def __repr__(self):
         return f"<ContentsArts content_id={self.content_id}, category_id={self.category_id}, name={self.name}>"
 
+class ContentsFeedbackSubcategories(db.Model):
+    __tablename__ = 'contents_feedback_subcategories'
+
+    content_id = db.Column(db.Integer, primary_key=True) 
+    subcategory_id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255))
+    created_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
+    updated_at = db.Column(db.DateTime, default=datetime.now(timezone.utc), onupdate=datetime.now(timezone.utc))
+
+    def __repr__(self):
+        return f"<ContentsArts content_id={self.content_id}, category_id={self.category_id}, name={self.name}>"
+
 
 class Levels(db.Model):
     __tablename__ = 'levels'
@@ -249,6 +261,24 @@ class Feedback(db.Model):
         uselist=True
     )
 
+    category_name = db.relationship(
+        'ContentsFeedbackCategories',
+        primaryjoin=and_(
+            foreign(content_id) == ContentsFeedbackCategories.content_id,
+            foreign(category_id) == ContentsFeedbackCategories.category_id
+        ),
+        viewonly=True
+    )
+
+    subcategory_name = db.relationship(
+        'ContentsFeedbackSubcategories',
+        primaryjoin=and_(
+            foreign(content_id) == ContentsFeedbackSubcategories.content_id,
+            foreign(subcategory_id) == ContentsFeedbackSubcategories.subcategory_id
+        ),
+        viewonly=True
+    )
+
     def serialize(self):
         return {
             'id': self.id,
@@ -272,7 +302,9 @@ class Feedback(db.Model):
             'quiz_mode_id': self.quiz_mode_id,
             'completed': self.completed,
             'level_id': self.level_id,
+            'category_name': self.category_name,
             'category_id': self.category_id,
+            'subcategory_name': self.subcategory_name,
             'subcategory_id': self.subcategory_id,
             'stage_id': self.stage_id,
             'duration': self.duration,

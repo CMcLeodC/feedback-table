@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
-from models import db, Contents, Dreamers, Users, Levels, Feedback, Dreamers_Users, Contents_Marketplace, Languages, ContentsArts, ContentsFeedbackCategories, Feedback_Types
+from models import db, Contents, Dreamers, Users, Levels, Feedback, Dreamers_Users, Contents_Marketplace, Languages, ContentsArts, ContentsFeedbackCategories, Feedback_Types, ContentsFeedbackSubcategories
 from dotenv import load_dotenv
 from sqlalchemy import text, func, and_
 from sqlalchemy.orm import joinedload, aliased
@@ -73,6 +73,17 @@ def get_content_feedback_category_by_id(content_id, category_id):
         'created_at': category.created_at,
         'updated_at': category.updated_at
     }), 200
+
+@app.route('/contents_feedback_subcategories', methods=['GET'])
+def get_contents_feedbacks_subcategories():
+    subcategories = ContentsFeedbackSubcategories.query.all()
+    return jsonify([{
+        'content_id': subcategory.content_id,
+        'subcategory_id': subcategory.subcategory_id,
+        'name': subcategory.name,
+        'created_at': subcategory.created_at,
+        'updated_at': subcategory.updated_at
+    } for subcategory in subcategories]), 200
 
 @app.route('/levels', methods=['GET'])
 def get_levels():
@@ -195,11 +206,6 @@ def get_feedback():
     page = int(request.args.get('page', 1))
     per_page = int(request.args.get('per_page', 30))
 
-    # title_subq = db.session.query(Contents_Marketplace.content_id, Contents_Marketplace.lang_id).filter(Contents_Marketplace.key == 'description').subquery()
-    # title_stmt = db.select([Feedback]).where(Feedback.content_id == title_subq.c.content_id,
-    #             Feedback.lang_id == title_subq.c.lang_id)
-    # result = db.session.execute(title_stmt)
-
     title_subquery = db.session.query(Contents_Marketplace.value).filter(
         and_(
             Feedback.content_id == Contents_Marketplace.content_id,
@@ -257,7 +263,9 @@ def get_feedback():
         Feedback.completed,
         Feedback.level_id,
         Levels.name.label("level_name"),
+        ContentsFeedbackCategories.name.label("category_name"),
         Feedback.category_id,
+        ContentsFeedbackSubcategories.name.label("subcategory_name"),
         Feedback.subcategory_id,
         Feedback.stage_id,
         Feedback.duration,
@@ -274,7 +282,17 @@ def get_feedback():
     .join(Contents, Feedback.content_id == Contents.id)\
     .join(Levels, Feedback.level_id == Levels.id)\
     .join(Languages, Feedback.lang_id == Languages.id)\
-    .join(Feedback_Types, Feedback.type_id == Feedback_Types.id)
+    .join(Feedback_Types, Feedback.type_id == Feedback_Types.id)\
+    .join(ContentsFeedbackCategories,
+          and_(
+            Feedback.content_id == ContentsFeedbackCategories.content_id,
+            Feedback.category_id == ContentsFeedbackCategories.category_id
+            ), isouter=True)\
+    .join(ContentsFeedbackSubcategories,
+          and_(
+            Feedback.content_id == ContentsFeedbackSubcategories.content_id,
+            Feedback.subcategory_id == ContentsFeedbackSubcategories.subcategory_id
+          ), isouter=True)
         
     
     if filter_value:
@@ -317,7 +335,9 @@ def get_feedback():
         'completed': feedback.completed,
         'level_id': feedback.level_id,
         'level_name': feedback.level_name,
+        'category_name': feedback.category_name if feedback.category_name else None,
         'category_id': feedback.category_id,
+        'subcategory_name': feedback.subcategory_name if feedback.subcategory_name else None,
         'subcategory_id': feedback.subcategory_id,
         'stage_id': feedback.stage_id,
         'duration': feedback.duration,
@@ -331,9 +351,7 @@ def get_feedback():
         'updated_at': feedback.updated_at.strftime('%d/%m/%y %H:%M:%S') if feedback.updated_at else None,
     } for feedback in feedbacks]
 
-
-    # print(result)
-    # print('page and per_page: ', page, per_page)
+    print(total_items)
 
     return jsonify({
         'data': result,
@@ -372,10 +390,12 @@ def get_specific_feedback(id):
     ).correlate(Feedback).scalar_subquery()
 
     feedback_data = db.session.query(
-    Feedback, Dreamers, Users, Contents, Levels, ContentMarketplaceAlias, Languages, Feedback_Types,
+    Feedback, Dreamers, Users, Contents, Levels, ContentMarketplaceAlias, Languages, Feedback_Types, ContentsFeedbackCategories, ContentsFeedbackSubcategories,
     title_subquery.label('content_title'),
     description_subquery.label('content_description'),
-    keywords_subquery.label('content_keywords')
+    keywords_subquery.label('content_keywords'),
+    ContentsFeedbackCategories.name.label("category_name"),
+    ContentsFeedbackSubcategories.name.label("subcategory_name")
 ) \
     .join(Dreamers, Feedback.dreamer_id == Dreamers.id) \
     .join(Users, Feedback.user_id == Users.id) \
@@ -386,6 +406,16 @@ def get_specific_feedback(id):
     .join(ContentMarketplaceAlias,
           and_(Feedback.content_id == ContentMarketplaceAlias.content_id,
                Feedback.lang_id == ContentMarketplaceAlias.lang_id)) \
+    .join(ContentsFeedbackCategories,
+          and_(
+            Feedback.content_id == ContentsFeedbackCategories.content_id,
+            Feedback.category_id == ContentsFeedbackCategories.category_id
+            ), isouter=True)\
+    .join(ContentsFeedbackSubcategories,
+          and_(
+            Feedback.content_id == ContentsFeedbackSubcategories.content_id,
+            Feedback.subcategory_id == ContentsFeedbackSubcategories.subcategory_id
+          ), isouter=True)\
     .filter(Feedback.id == id) \
     .first()
 
@@ -393,7 +423,7 @@ def get_specific_feedback(id):
         return jsonify({"error": "Feedback not found"}), 404
 
     # Unpack the results into the appropriate variables
-    feedback, dreamer, user, content, level, content_marketplace, language, feedback_type, content_title, content_description, content_keywords = feedback_data
+    feedback, dreamer, user, content, level, content_marketplace, language, feedback_type, contents_feedback_categories, contents_feedback_subcategories, content_title, content_description, content_keywords, category_name, subcategory_name = feedback_data
 
     return jsonify({
         'id': feedback.id,
@@ -418,7 +448,9 @@ def get_specific_feedback(id):
         'completed': feedback.completed,
         'level_id': feedback.level_id,
         'level_name': level.name if level else None,
+        'category_name': category_name if category_name else None,
         'category_id': feedback.category_id,
+        'subcategory_name': subcategory_name if subcategory_name else None,
         'subcategory_id': feedback.subcategory_id,
         'stage_id': feedback.stage_id,
         'duration': feedback.duration,
@@ -447,5 +479,5 @@ def get_dreamer_avatar(filename):
 
 if __name__ == '__main__':
     with app.app_context():
-        db.create_all()  # Creates tables based on models if they don't exist yet
+        db.create_all()
     app.run(debug=True)

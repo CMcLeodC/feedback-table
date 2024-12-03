@@ -1,5 +1,10 @@
 <template>
     <div class="table-container">
+        <div class="pagination">
+            <button :disabled="currentPage === 1" @click="prevPage">Previous</button>
+            <span>Page {{ currentPage }} of {{ pageCount }}</span>
+            <button :disabled="currentPage === pageCount" @click="nextPage">Next</button>
+        </div>
         <table class="table">
             <thead>
                 <tr>
