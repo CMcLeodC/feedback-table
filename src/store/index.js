@@ -27,9 +27,11 @@ export const useStore = defineStore('storeID', {
     dreamerInfo: {},
     userInfo: {},
     contentArt: {},
-    items: ['Englisn', 'Spanish', 'French', 'Catalan'],
+    items: ['English', 'Spanish', 'French', 'Catalan'],
     value: ['Portuguese', 'Italian', 'Turkish', 'Latam'],
-    types: ['Game', 'Tale', 'Quiz', 'Theory', 'Video', 'Audiobook', 'PDF']
+    types: ['Game', 'Tale', 'Quiz', 'Theory', 'Video', 'Audiobook', 'PDF'],
+    typesOptions: ['Game', 'Tale', 'Quiz', 'Theory', 'Video', 'Audiobook', 'PDF'],
+    completed: true
   }),
   actions: {
     async fetchFeedback() {

@@ -9,7 +9,8 @@
     </div>
     
     <AdvancedFilter />
-
+    <DatePicker />
+    <TypeFilterGroup />
     <TableFeedback :feedbackList="feedbackList" :fields="store.fields" :sortBy="sortBy" :sortDesc="sortDesc" />
 
     <!-- <MoreInfoModal :moreInfo="moreInfo" /> -->
@@ -29,6 +30,8 @@ import VuetifyTable from './components/VuetifyTable.vue';
 import VuetifyModal from './components/VuetifyModal.vue';
 import openModal from './components/VuetifyModal.vue';
 import AdvancedFilter from './components/AdvancedFilter.vue';
+import DatePicker from './components/DatePicker.vue';
+import TypeFilterGroup from './components/TypeFilterGroup.vue';
 const store = useStore()
 
 const { fields, fetchFeedback, } = storeToRefs(store)

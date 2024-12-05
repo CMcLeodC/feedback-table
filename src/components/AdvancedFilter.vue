@@ -8,27 +8,31 @@
           cols="12"
           sm="6"
         >
-          <v-select
+          <!-- <v-select
             v-model="store.value"
             :items="store.items"
             attach
             chips
             label="Languages"
             multiple
-          ></v-select>
+          ></v-select> -->
+          <LanguageFilterGroup />
         </v-col>
         <v-col
           cols="12"
           sm="6"
         >
-          <v-select
+          <!-- <v-select
             v-model="store.types"
-            :items="store.types"
+            :items="store.typesOptions"
             filled
             chips
             label="Type"
             multiple
-          ></v-select>
+            clearable
+          >
+        </v-select> -->
+        <TypeFilterGroup />
         </v-col>
         <v-col
           cols="12"
@@ -65,6 +69,8 @@
 import { useStore } from '../store';
 import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
+import TypeFilterGroup from './TypeFilterGroup.vue';
+import LanguageFilterGroup from './LanguageFilterGroup.vue';
 
 const store = useStore();
 </script>
