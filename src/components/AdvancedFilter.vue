@@ -1,13 +1,8 @@
 <template>
-    <v-card>
+  <v-card>
     <v-container fluid>
-      <v-row
-        align="center"
-      >
-        <v-col
-          cols="12"
-          sm="6"
-        >
+      <v-row align="center">
+        <v-col cols="12" sm="6">
           <!-- <v-select
             v-model="store.value"
             :items="store.items"
@@ -18,10 +13,7 @@
           ></v-select> -->
           <LanguageFilterGroup />
         </v-col>
-        <v-col
-          cols="12"
-          sm="6"
-        >
+        <v-col cols="12" sm="6">
           <!-- <v-select
             v-model="store.types"
             :items="store.typesOptions"
@@ -32,33 +24,31 @@
             clearable
           >
         </v-select> -->
-        <TypeFilterGroup />
+          <TypeFilterGroup />
         </v-col>
-        <v-col
-          cols="12"
-          sm="6"
-        >
-          <v-select
+        <v-col cols="12" sm="6">
+          <!-- <v-select
             v-model="store.value"
             :items="store.items"
             chips
             label="Completed"
             multiple
             outlined
-          ></v-select>
+          ></v-select> -->
+          <v-chip :model-value="true" class="ms-16" color="teal" prepend-icon="mdi-checkbox-marked-circle" closable>
+            Completed
+          </v-chip>
         </v-col>
-        <v-col
-          cols="12"
-          sm="6"
-        >
-          <v-select
+        <v-col cols="12" sm="6">
+          <!-- <v-select
             v-model="store.value"
             :items="store.items"
             chips
             label="Dates"
             multiple
             solo
-          ></v-select>
+          ></v-select> -->
+          <DateInput />
         </v-col>
       </v-row>
     </v-container>
@@ -71,6 +61,7 @@ import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 import TypeFilterGroup from './TypeFilterGroup.vue';
 import LanguageFilterGroup from './LanguageFilterGroup.vue';
+import DateInput from './DateInput.vue';
 
 const store = useStore();
 </script>

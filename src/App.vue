@@ -2,6 +2,7 @@
   <div class="app-container">
     <h1>Feedback</h1>
     <!-- <VuetifyTable /> -->
+    <v-icon icon="fa:fas fa-search"></v-icon>
     <div class="input-field">
       <input type="search" v-model="store.filterValue" id="search-bar" placeholder="Search feedback..."
         @keyup.enter="store.fetchFeedback">
@@ -9,8 +10,6 @@
     </div>
     
     <AdvancedFilter />
-    <DatePicker />
-    <TypeFilterGroup />
     <TableFeedback :feedbackList="feedbackList" :fields="store.fields" :sortBy="sortBy" :sortDesc="sortDesc" />
 
     <!-- <MoreInfoModal :moreInfo="moreInfo" /> -->
