@@ -87,7 +87,7 @@ const { sortBy, feedbackList, sortDesc, currentPage, pageCount, perPage } = stor
 const nextPage = () => {
     if (currentPage.value < pageCount.value) {
         currentPage.value++;
-        store.fetchFeedback();
+        store.applyAdvancedFilters();
         console.log(currentPage.value);
         
     }
@@ -96,7 +96,7 @@ const nextPage = () => {
 const prevPage = () => {
     if (currentPage.value > 1) {
         currentPage.value--;
-        store.fetchFeedback();
+        store.applyAdvancedFilters();
         console.log(currentPage.value);
     }
 };
@@ -109,7 +109,7 @@ const sortTable = (field) => {
         sortDesc.value = false; // Default to ascending
     }
     currentPage.value = 1; // Reset to the first page
-    store.fetchFeedback();
+    store.applyAdvancedFilters();
 };
 
 </script>

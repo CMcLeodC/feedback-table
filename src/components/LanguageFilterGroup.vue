@@ -9,7 +9,7 @@
         <div class="text-h6">Select the language</div>
   
         <v-responsive class="overflow-y-auto" max-height="280">
-          <v-chip-group class="mt-3" column filter multiple>
+          <v-chip-group class="mt-3" column filter multiple v-model="store.selectedLanguages">
             <v-chip
               v-for="language in store.languages"
               :key="language"

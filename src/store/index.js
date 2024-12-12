@@ -28,7 +28,9 @@ export const useStore = defineStore('storeID', {
     userInfo: {},
     contentArt: {},
     languages: ['Español (España)', 'English', 'Français', 'Português', 'Italiano', 'Català', 'Türkçe', 'Español (América Latina)'],
+    selectedLanguages: [],
     types: ['📚 Tale', '💡 Quiz', '🎮 Game', '🎥 Video', '🎵 Audiobook', '🎓 Theory', '📰 PDF'],
+    selectedTypes: [],
     completed: true,
     startDate: "",
     endDate: ""
@@ -59,8 +61,8 @@ export const useStore = defineStore('storeID', {
           desc: this.sortDesc,
           page: this.currentPage,
           per_page: this.perPage,
-          languages: this.languages,
-          types: this.types,
+          languages: this.selectedLanguages,
+          types: this.selectedTypes,
           completed: this.completed,
           startDate: this.startDate,
           endDate: this.endDate

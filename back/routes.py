@@ -531,7 +531,7 @@ def feedback():
                     )
                 )
         sort_field = payload.get('sort', 'user_name')
-        desc = payload.get('desc', 'false').lower() == 'true'
+        desc = payload.get('desc', False)
         page = payload.get('page', 1)
         per_page = payload.get('per_page', 30)
         languages = payload.get('languages', [])

@@ -14,7 +14,8 @@
     <!-- <MoreInfoModal :moreInfo="moreInfo" /> -->
     <VuetifyModal />
   </div>
-  {{console.log(sortBy)}}
+  {{console.log("Selected Languages: ", store.selectedLanguages)}}
+  {{ console.log("Selected Types: ", store.selectedTypes) }}
 </template>
 
 <script setup>
@@ -46,6 +47,14 @@ const perPage = ref(30);
 const totalRows = ref(null)
 
 const rows = computed(() => feedbackList.value.length)
+
+watch(
+  // () => [store.selectedLanguages, store.selectedTypes],
+  () => store.selectedLanguages,
+  () => {
+    store.applyAdvancedFilters();
+  }
+)
 
 onMounted(() => {
   store.fetchFeedback();
