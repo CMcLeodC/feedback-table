@@ -27,16 +27,47 @@ export const useStore = defineStore('storeID', {
     dreamerInfo: {},
     userInfo: {},
     contentArt: {},
-    items: ['English', 'Spanish', 'French', 'Catalan'],
-    value: ['Portuguese', 'Italian', 'Turkish', 'Latam'],
-    types: ['Game', 'Tale', 'Quiz', 'Theory', 'Video', 'Audiobook', 'PDF'],
-    typesOptions: ['Game', 'Tale', 'Quiz', 'Theory', 'Video', 'Audiobook', 'PDF'],
-    completed: true
+    languages: ['Español (España)', 'English', 'Français', 'Português', 'Italiano', 'Català', 'Türkçe', 'Español (América Latina)'],
+    types: ['📚 Tale', '💡 Quiz', '🎮 Game', '🎥 Video', '🎵 Audiobook', '🎓 Theory', '📰 PDF'],
+    completed: true,
+    startDate: "",
+    endDate: ""
   }),
   actions: {
     async fetchFeedback() {
       try {
         const response = await fetch(`/api/feedback?filter=${this.filterValue}&sort=${this.sortBy}&desc=${this.sortDesc}&page=${this.currentPage}&per_page=${this.perPage}`);
+        const data = await response.json();
+        this.feedbackList = data.data;
+        this.totalItems = data.total;
+        this.pageCount = Math.ceil(this.totalItems / this.perPage);
+        console.log(this.feedbackList);     
+      } catch (error) {
+        console.error("Error fetching feedback:", error);
+      }
+    },
+    async applyAdvancedFilters() {
+      const config = {
+        method: 'POST',
+        headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filter: this.filterValue,
+          sort: this.sortBy,
+          desc: this.sortDesc,
+          page: this.currentPage,
+          per_page: this.perPage,
+          languages: this.languages,
+          types: this.types,
+          completed: this.completed,
+          startDate: this.startDate,
+          endDate: this.endDate
+        })
+        };
+      try {
+        const response = await fetch('/api/feedback', config);
         const data = await response.json();
         this.feedbackList = data.data;
         this.totalItems = data.total;

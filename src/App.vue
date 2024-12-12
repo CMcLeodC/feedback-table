@@ -6,7 +6,6 @@
     <div class="input-field">
       <input type="search" v-model="store.filterValue" id="search-bar" placeholder="Search feedback..."
         @keyup.enter="store.fetchFeedback">
-      {{ console.log(store.filterValue) }}
     </div>
     
     <AdvancedFilter />

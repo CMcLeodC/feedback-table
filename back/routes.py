@@ -3,7 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from models import db, Contents, Dreamers, Users, Levels, Feedback, Dreamers_Users, Contents_Marketplace, Languages, ContentsArts, ContentsFeedbackCategories, Feedback_Types, ContentsFeedbackSubcategories
 from dotenv import load_dotenv
-from sqlalchemy import text, func, and_
+from sqlalchemy import text, func, and_, or_
 from sqlalchemy.orm import joinedload, aliased
 import os
 
@@ -358,6 +358,351 @@ def get_feedback():
         'total': total_items
     }), 200
 
+@app.route('/feedback', methods=['GET', 'POST'])
+def feedback():
+    if request.method == 'GET':
+        filter_value = request.args.get('filter', '')
+        sort_field = request.args.get('sort', 'user_name')
+        desc = request.args.get('desc', 'false').lower() == 'true'
+        page = int(request.args.get('page', 1))
+        per_page = int(request.args.get('per_page', 30))
+
+        title_subquery = db.session.query(Contents_Marketplace.value).filter(
+            and_(
+                Feedback.content_id == Contents_Marketplace.content_id,
+                Feedback.lang_id == Contents_Marketplace.lang_id,
+                Contents_Marketplace.key == 'title'
+            )
+        ).correlate(Feedback).scalar_subquery()
+
+        description_subquery = db.session.query(Contents_Marketplace.value).filter(
+            and_(
+                Feedback.content_id == Contents_Marketplace.content_id,
+                Feedback.lang_id == Contents_Marketplace.lang_id,
+                Contents_Marketplace.key == 'description'
+            )
+        ).correlate(Feedback).scalar_subquery()
+
+        keywords_subquery = db.session.query(Contents_Marketplace.value).filter(
+            and_(
+                Feedback.content_id == Contents_Marketplace.content_id,
+                Feedback.lang_id == Contents_Marketplace.lang_id,
+                Contents_Marketplace.key == 'keywords'
+            )
+        ).correlate(Feedback).scalar_subquery()
+
+        sortable_fields = {
+            'created_at': Feedback.created_at,
+            'duration': Feedback.duration,
+            'score': Feedback.score,
+            'user_name': Users.name,
+            'dreamer_name': Dreamers.name,
+            'content_title': title_subquery,
+            'level_name': Levels.name
+        }
+
+        query = db.session.query(
+            Feedback.id,
+            Feedback.user_id,
+            Users.name.label("user_name"),
+            Feedback.dreamer_id,
+            Dreamers.name.label("dreamer_name"),
+            Dreamers.avatar.label("dreamer_avatar"),
+            Feedback.content_id,
+            Contents.identifier.label("content_identifier"),
+            title_subquery.label("content_title"),
+            description_subquery.label("content_description"),
+            keywords_subquery.label("content_keywords"),
+            Feedback.library_version_id,
+            Languages.local_name.label("lang_local_name"),
+            Feedback.lang_id,
+            Feedback_Types.feedback_type.label("type_name"),
+            Feedback.type_id,
+            Feedback.game_mode_id,
+            Feedback.reading_mode_id,
+            Feedback.quiz_mode_id,
+            Feedback.completed,
+            Feedback.level_id,
+            Levels.name.label("level_name"),
+            ContentsFeedbackCategories.name.label("category_name"),
+            Feedback.category_id,
+            ContentsFeedbackSubcategories.name.label("subcategory_name"),
+            Feedback.subcategory_id,
+            Feedback.stage_id,
+            Feedback.duration,
+            Feedback.total_score,
+            Feedback.score,
+            Feedback.failures,
+            Feedback.details,
+            Feedback.session_id,
+            Feedback.game_id,
+            Feedback.created_at,
+            Feedback.updated_at
+        ).join(Dreamers, Feedback.dreamer_id == Dreamers.id)\
+        .join(Users, Feedback.user_id == Users.id)\
+        .join(Contents, Feedback.content_id == Contents.id)\
+        .join(Levels, Feedback.level_id == Levels.id)\
+        .join(Languages, Feedback.lang_id == Languages.id)\
+        .join(Feedback_Types, Feedback.type_id == Feedback_Types.id)\
+        .join(ContentsFeedbackCategories,
+            and_(
+                Feedback.content_id == ContentsFeedbackCategories.content_id,
+                Feedback.category_id == ContentsFeedbackCategories.category_id
+                ), isouter=True)\
+        .join(ContentsFeedbackSubcategories,
+            and_(
+                Feedback.content_id == ContentsFeedbackSubcategories.content_id,
+                Feedback.subcategory_id == ContentsFeedbackSubcategories.subcategory_id
+            ), isouter=True)
+            
+        
+        if filter_value:
+            filter_pattern = f"%{filter_value}%"
+            query = query.filter(
+                (Users.name.ilike(filter_pattern)) |
+                (Dreamers.name.ilike(filter_pattern)) |
+                (title_subquery.ilike(filter_pattern))
+            )
+
+        if sort_field in sortable_fields:
+            sort_column = sortable_fields[sort_field]
+            query = query.order_by(sort_column.desc() if desc else sort_column.asc())
+        
+        # print("Query:", str(query))
+
+        total_items = query.count()
+        feedbacks = query.offset((page - 1) * per_page).limit(per_page).all()
+    
+        result = [{
+            'id': feedback.id,
+            'user_id': feedback.user_id,
+            'user_name': feedback.user_name,
+            'dreamer_id': feedback.dreamer_id,
+            'dreamer_name': feedback.dreamer_name,
+            'dreamer_avatar': feedback.dreamer_avatar,
+            'content_id': feedback.content_id,
+            'content_identifier': feedback.content_identifier,
+            'content_title': feedback.content_title.strip('"') if feedback.content_title else None,
+            'content_description': feedback.content_description.strip('"') if feedback.content_description else None,
+            'content_keywords': feedback.content_keywords.strip('"') if feedback.content_keywords else None,
+            'library_version_id': feedback.library_version_id,
+            'lang_local_name': feedback.lang_local_name,
+            'lang_id': feedback.lang_id,
+            'type_name': feedback.type_name,
+            'type_id': feedback.type_id,
+            'game_mode_id': feedback.game_mode_id,
+            'reading_mode_id': feedback.reading_mode_id,
+            'quiz_mode_id': feedback.quiz_mode_id,
+            'completed': feedback.completed,
+            'level_id': feedback.level_id,
+            'level_name': feedback.level_name,
+            'category_name': feedback.category_name if feedback.category_name else None,
+            'category_id': feedback.category_id,
+            'subcategory_name': feedback.subcategory_name if feedback.subcategory_name else None,
+            'subcategory_id': feedback.subcategory_id,
+            'stage_id': feedback.stage_id,
+            'duration': feedback.duration,
+            'total_score': feedback.total_score,
+            'score': feedback.score,
+            'failures': feedback.failures,
+            'details': feedback.details,
+            'session_id': feedback.session_id,
+            'game_id': feedback.game_id,
+            'created_at': feedback.created_at.strftime('%d/%m/%y %H:%M:%S') if feedback.created_at else None,
+            'updated_at': feedback.updated_at.strftime('%d/%m/%y %H:%M:%S') if feedback.updated_at else None,
+        } for feedback in feedbacks]
+
+        print(total_items)
+
+        return jsonify({
+            'data': result,
+            'total': total_items
+        }), 200
+    
+    elif request.method == 'POST':
+        filters = []
+        payload = request.get_json()
+        filter_value = payload.get('filter', '')
+        if filter_value:
+                filters.append(
+                    or_(
+                        Users.name.ilike(f"%{filter_value}%"),
+                        Dreamers.name.ilike(f"%{filter_value}%")
+                    )
+                )
+        sort_field = payload.get('sort', 'user_name')
+        desc = payload.get('desc', 'false').lower() == 'true'
+        page = payload.get('page', 1)
+        per_page = payload.get('per_page', 30)
+        languages = payload.get('languages', [])
+        if languages:
+            filters.append(Languages.local_name.in_(languages))
+        if not isinstance(languages, list):
+            languages = []
+        types = payload.get('types', [])
+        if types:
+            filters.append(Feedback_Types.feedback_type.in_(types))
+        if not isinstance(types, list):
+            types = []
+        completed = payload.get('completed', None)
+        if completed is not None:
+                filters.append(Feedback.completed == (completed == 'true'))
+        start_date = payload.get('start_date')
+        end_date = payload.get('end_date')
+
+        if start_date and end_date:
+            filters.append(Feedback.created_at.between(start_date, end_date))
+        elif start_date:
+            filters.append(func.date(Feedback.created_at) == start_date)
+        elif end_date:
+            filters.append(func.date(Feedback.created_at) == end_date)
+
+
+
+        title_subquery = db.session.query(Contents_Marketplace.value).filter(
+            and_(
+                Feedback.content_id == Contents_Marketplace.content_id,
+                Feedback.lang_id == Contents_Marketplace.lang_id,
+                Contents_Marketplace.key == 'title'
+            )
+        ).correlate(Feedback).scalar_subquery()
+
+        description_subquery = db.session.query(Contents_Marketplace.value).filter(
+            and_(
+                Feedback.content_id == Contents_Marketplace.content_id,
+                Feedback.lang_id == Contents_Marketplace.lang_id,
+                Contents_Marketplace.key == 'description'
+            )
+        ).correlate(Feedback).scalar_subquery()
+
+        keywords_subquery = db.session.query(Contents_Marketplace.value).filter(
+            and_(
+                Feedback.content_id == Contents_Marketplace.content_id,
+                Feedback.lang_id == Contents_Marketplace.lang_id,
+                Contents_Marketplace.key == 'keywords'
+            )
+        ).correlate(Feedback).scalar_subquery()
+
+        sortable_fields = {
+            'created_at': Feedback.created_at,
+            'duration': Feedback.duration,
+            'score': Feedback.score,
+            'user_name': Users.name,
+            'dreamer_name': Dreamers.name,
+            'content_title': title_subquery,
+            'level_name': Levels.name
+        }
+
+        query = db.session.query(
+            Feedback.id,
+            Feedback.user_id,
+            Users.name.label("user_name"),
+            Feedback.dreamer_id,
+            Dreamers.name.label("dreamer_name"),
+            Dreamers.avatar.label("dreamer_avatar"),
+            Feedback.content_id,
+            Contents.identifier.label("content_identifier"),
+            title_subquery.label("content_title"),
+            description_subquery.label("content_description"),
+            keywords_subquery.label("content_keywords"),
+            Feedback.library_version_id,
+            Languages.local_name.label("lang_local_name"),
+            Feedback.lang_id,
+            Feedback_Types.feedback_type.label("type_name"),
+            Feedback.type_id,
+            Feedback.game_mode_id,
+            Feedback.reading_mode_id,
+            Feedback.quiz_mode_id,
+            Feedback.completed,
+            Feedback.level_id,
+            Levels.name.label("level_name"),
+            ContentsFeedbackCategories.name.label("category_name"),
+            Feedback.category_id,
+            ContentsFeedbackSubcategories.name.label("subcategory_name"),
+            Feedback.subcategory_id,
+            Feedback.stage_id,
+            Feedback.duration,
+            Feedback.total_score,
+            Feedback.score,
+            Feedback.failures,
+            Feedback.details,
+            Feedback.session_id,
+            Feedback.game_id,
+            Feedback.created_at,
+            Feedback.updated_at
+        ).join(Dreamers, Feedback.dreamer_id == Dreamers.id)\
+        .join(Users, Feedback.user_id == Users.id)\
+        .join(Contents, Feedback.content_id == Contents.id)\
+        .join(Levels, Feedback.level_id == Levels.id)\
+        .join(Languages, Feedback.lang_id == Languages.id)\
+        .join(Feedback_Types, Feedback.type_id == Feedback_Types.id)\
+        .join(ContentsFeedbackCategories,
+            and_(
+                Feedback.content_id == ContentsFeedbackCategories.content_id,
+                Feedback.category_id == ContentsFeedbackCategories.category_id
+                ), isouter=True)\
+        .join(ContentsFeedbackSubcategories,
+            and_(
+                Feedback.content_id == ContentsFeedbackSubcategories.content_id,
+                Feedback.subcategory_id == ContentsFeedbackSubcategories.subcategory_id
+            ), isouter=True).filter(and_(*filters))
+            
+
+        if sort_field in sortable_fields:
+            sort_column = sortable_fields[sort_field]
+            query = query.order_by(sort_column.desc() if desc else sort_column.asc())
+        
+        print("Query:", str(query))
+
+        total_items = query.count()
+        feedbacks = query.offset((page - 1) * per_page).limit(per_page).all()
+    
+        result = [{
+            'id': feedback.id,
+            'user_id': feedback.user_id,
+            'user_name': feedback.user_name,
+            'dreamer_id': feedback.dreamer_id,
+            'dreamer_name': feedback.dreamer_name,
+            'dreamer_avatar': feedback.dreamer_avatar,
+            'content_id': feedback.content_id,
+            'content_identifier': feedback.content_identifier,
+            'content_title': feedback.content_title.strip('"') if feedback.content_title else None,
+            'content_description': feedback.content_description.strip('"') if feedback.content_description else None,
+            'content_keywords': feedback.content_keywords.strip('"') if feedback.content_keywords else None,
+            'library_version_id': feedback.library_version_id,
+            'lang_local_name': feedback.lang_local_name,
+            'lang_id': feedback.lang_id,
+            'type_name': feedback.type_name,
+            'type_id': feedback.type_id,
+            'game_mode_id': feedback.game_mode_id,
+            'reading_mode_id': feedback.reading_mode_id,
+            'quiz_mode_id': feedback.quiz_mode_id,
+            'completed': feedback.completed,
+            'level_id': feedback.level_id,
+            'level_name': feedback.level_name,
+            'category_name': feedback.category_name if feedback.category_name else None,
+            'category_id': feedback.category_id,
+            'subcategory_name': feedback.subcategory_name if feedback.subcategory_name else None,
+            'subcategory_id': feedback.subcategory_id,
+            'stage_id': feedback.stage_id,
+            'duration': feedback.duration,
+            'total_score': feedback.total_score,
+            'score': feedback.score,
+            'failures': feedback.failures,
+            'details': feedback.details,
+            'session_id': feedback.session_id,
+            'game_id': feedback.game_id,
+            'created_at': feedback.created_at.strftime('%d/%m/%y %H:%M:%S') if feedback.created_at else None,
+            'updated_at': feedback.updated_at.strftime('%d/%m/%y %H:%M:%S') if feedback.updated_at else None,
+        } for feedback in feedbacks]
+
+        print(total_items)
+
+        return jsonify({
+            'data': result,
+            'total': total_items
+        }), 200
+
 
 @app.route('/feedback/<int:id>', methods=['GET'])
 def get_specific_feedback(id):
@@ -464,6 +809,109 @@ def get_specific_feedback(id):
         'updated_at': feedback.updated_at.strftime('%d/%m/%y %H:%M:%S') if feedback.updated_at else None,
     }), 200
 
+
+def _build_feedback_query(filter_value='', sort_field='user_name', desc=False, page=1, per_page=30):
+    """
+    Builds a dynamic query for fetching Feedback data with filtering,
+    sorting, and pagination.
+    """
+    title_subquery = db.session.query(Contents_Marketplace.value).filter(
+        and_(
+            Feedback.content_id == Contents_Marketplace.content_id,
+            Feedback.lang_id == Contents_Marketplace.lang_id,
+            Contents_Marketplace.key == 'title'
+        )
+    ).correlate(Feedback).scalar_subquery()
+
+    description_subquery = db.session.query(Contents_Marketplace.value).filter(
+        and_(
+            Feedback.content_id == Contents_Marketplace.content_id,
+            Feedback.lang_id == Contents_Marketplace.lang_id,
+            Contents_Marketplace.key == 'description'
+        )
+    ).correlate(Feedback).scalar_subquery()
+
+    keywords_subquery = db.session.query(Contents_Marketplace.value).filter(
+        and_(
+            Feedback.content_id == Contents_Marketplace.content_id,
+            Feedback.lang_id == Contents_Marketplace.lang_id,
+            Contents_Marketplace.key == 'keywords'
+        )
+    ).correlate(Feedback).scalar_subquery()
+
+    query = db.session.query(
+            Feedback.id,
+            Feedback.user_id,
+            Users.name.label("user_name"),
+            Feedback.dreamer_id,
+            Dreamers.name.label("dreamer_name"),
+            Dreamers.avatar.label("dreamer_avatar"),
+            Feedback.content_id,
+            Contents.identifier.label("content_identifier"),
+            title_subquery.label("content_title"),
+            description_subquery.label("content_description"),
+            keywords_subquery.label("content_keywords"),
+            Feedback.library_version_id,
+            Languages.local_name.label("lang_local_name"),
+            Feedback.lang_id,
+            Feedback_Types.feedback_type.label("type_name"),
+            Feedback.type_id,
+            Feedback.game_mode_id,
+            Feedback.reading_mode_id,
+            Feedback.quiz_mode_id,
+            Feedback.completed,
+            Feedback.level_id,
+            Levels.name.label("level_name"),
+            ContentsFeedbackCategories.name.label("category_name"),
+            Feedback.category_id,
+            ContentsFeedbackSubcategories.name.label("subcategory_name"),
+            Feedback.subcategory_id,
+            Feedback.stage_id,
+            Feedback.duration,
+            Feedback.total_score,
+            Feedback.score,
+            Feedback.failures,
+            Feedback.details,
+            Feedback.session_id,
+            Feedback.game_id,
+            Feedback.created_at,
+            Feedback.updated_at
+        ).join(Dreamers, Feedback.dreamer_id == Dreamers.id)\
+        .join(Users, Feedback.user_id == Users.id)\
+        .join(Contents, Feedback.content_id == Contents.id)\
+        .join(Levels, Feedback.level_id == Levels.id)\
+        .join(Languages, Feedback.lang_id == Languages.id)\
+        .join(Feedback_Types, Feedback.type_id == Feedback_Types.id)\
+        .join(ContentsFeedbackCategories,
+            and_(
+                Feedback.content_id == ContentsFeedbackCategories.content_id,
+                Feedback.category_id == ContentsFeedbackCategories.category_id
+                ), isouter=True)\
+        .join(ContentsFeedbackSubcategories,
+            and_(
+                Feedback.content_id == ContentsFeedbackSubcategories.content_id,
+                Feedback.subcategory_id == ContentsFeedbackSubcategories.subcategory_id
+            ), isouter=True)
+
+    if filter_value:
+            filter_pattern = f"%{filter_value}%"
+            query = query.filter(
+                (Users.name.ilike(filter_pattern)) |
+                (Dreamers.name.ilike(filter_pattern)) |
+                (title_subquery.ilike(filter_pattern))
+            )
+
+    sortable_fields = {
+            'created_at': Feedback.created_at,
+            'duration': Feedback.duration,
+            'score': Feedback.score,
+            'user_name': Users.name,
+            'dreamer_name': Dreamers.name,
+            'content_title': title_subquery,
+            'level_name': Levels.name
+        }
+
+    return query
 
 
 @app.route('/back/images/dreamer_avatars/<filename>', methods=['GET'])

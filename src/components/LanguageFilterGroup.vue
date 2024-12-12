@@ -11,7 +11,7 @@
         <v-responsive class="overflow-y-auto" max-height="280">
           <v-chip-group class="mt-3" column filter multiple>
             <v-chip
-              v-for="language in languages"
+              v-for="language in store.languages"
               :key="language"
               :text="language"
               :value="language"
@@ -23,16 +23,10 @@
   </template>
 
 <script setup>
-const languages = [
-        'Spanish',
-        'English',
-        'French',
-        'Portuguese',
-        'Italian',
-        'Catalan',
-        'Turkish',
-        'Latam',
-      ]
+import { useStore } from '../store';
+
+import { storeToRefs } from 'pinia';
+const store = useStore()
 </script>
 
 <style scoped></style>
