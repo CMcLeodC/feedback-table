@@ -546,7 +546,7 @@ def feedback():
             types = []
         completed = payload.get('completed', None)
         if completed is not None:
-                filters.append(Feedback.completed == (completed == 'true'))
+                filters.append(Feedback.completed == (completed == True))
         start_date = payload.get('start_date')
         end_date = payload.get('end_date')
 

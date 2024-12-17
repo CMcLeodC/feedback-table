@@ -6,8 +6,12 @@
     <div class="input-field">
       <input type="search" v-model="store.filterValue" id="search-bar" placeholder="Search feedback..."
         @keyup.enter="store.fetchFeedback">
-    </div>
-    
+      </div>
+      <div class="reset-button">
+        <v-btn @click="store.resetFilters" id="reset-button">
+          Reset search and filters
+        </v-btn>
+      </div>
     <AdvancedFilter />
     <TableFeedback :feedbackList="feedbackList" :fields="store.fields" :sortBy="sortBy" :sortDesc="sortDesc" />
 
@@ -15,7 +19,9 @@
     <VuetifyModal />
   </div>
   {{console.log("Selected Languages: ", store.selectedLanguages)}}
+  {{ console.log("Just Types: ", store.types) }}
   {{ console.log("Selected Types: ", store.selectedTypes) }}
+  {{ console.log("This is THE SELECTED OPTION: ", store.completed) }}
 </template>
 
 <script setup>
@@ -49,9 +55,9 @@ const totalRows = ref(null)
 const rows = computed(() => feedbackList.value.length)
 
 watch(
-  // () => [store.selectedLanguages, store.selectedTypes],
-  () => store.selectedLanguages,
+  () => [store.selectedLanguages, store.selectedTypes, store.startDate, store.endDate, store.completed],
   () => {
+    store.currentPage = 1;
     store.applyAdvancedFilters();
   }
 )
@@ -80,6 +86,12 @@ h1 {
   margin: 15px;
 }
 
+.reset-button {
+  display: flex;
+  justify-content: center;
+  margin: 15px;
+}
+
 #search-bar {
   width: 50%;
   padding: 8px;
@@ -89,6 +101,10 @@ h1 {
   color: white;
   text-align: center;
   font-size: 18px;
+}
+
+#reset-button {
+  text-align: center;
 }
 
 .feedback-table .table-striped tbody tr:nth-of-type(odd) {

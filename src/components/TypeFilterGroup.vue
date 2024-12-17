@@ -9,7 +9,7 @@
         <div class="text-h6">Select the type</div>
   
         <v-responsive class="overflow-y-auto" max-height="280">
-          <v-chip-group class="mt-3" column filter multiple v-model="store.selectedTypes">
+          <v-chip-group class="mt-3" column filter multiple v-model="mappedSelectedTypes">
             <v-chip
               v-for="type in store.types"
               :key="type"
@@ -37,12 +37,21 @@ const typeMappings = {
   '📰 PDF': 'PDF'
 };
 
-const mappedSelectedTypes = computed(() => {
-  (selected) => {
-    store.selectedTypes = selected.map((type) => typeMappings[type] || type);
-  }
-
-})
+const mappedSelectedTypes = computed({
+  get: () =>
+    store.selectedTypes.map((type) =>
+      Object.values(typeMappings).includes(type)
+        ? Object.keys(typeMappings).find((key) => typeMappings[key] === type) // Map database-friendly back to chip-friendly
+        : type
+    ),
+  set: (newTypes) => {
+    store.selectedTypes = newTypes.map((type) =>
+      Object.keys(typeMappings).includes(type)
+        ? typeMappings[type] // Map chip-friendly to database-friendly
+        : type
+    );
+  },
+});
 </script>
 
 <style scoped></style>

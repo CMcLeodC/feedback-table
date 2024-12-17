@@ -31,9 +31,10 @@ export const useStore = defineStore('storeID', {
     selectedLanguages: [],
     types: ['📚 Tale', '💡 Quiz', '🎮 Game', '🎥 Video', '🎵 Audiobook', '🎓 Theory', '📰 PDF'],
     selectedTypes: [],
-    completed: true,
+    completed: null,
     startDate: "",
-    endDate: ""
+    endDate: "",
+    dates: []
   }),
   actions: {
     async fetchFeedback() {
@@ -64,8 +65,8 @@ export const useStore = defineStore('storeID', {
           languages: this.selectedLanguages,
           types: this.selectedTypes,
           completed: this.completed,
-          startDate: this.startDate,
-          endDate: this.endDate
+          start_date: this.startDate,
+          end_date: this.endDate
         })
         };
       try {
@@ -130,6 +131,9 @@ export const useStore = defineStore('storeID', {
         console.error('Error:', error);
         this.userInfo = null;
       };
+    },
+    resetFilters() {
+      this.$reset();
     }
   }
 })
