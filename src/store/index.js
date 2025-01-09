@@ -44,7 +44,7 @@ export const useStore = defineStore('storeID', {
         this.feedbackList = data.data;
         this.totalItems = data.total;
         this.pageCount = Math.ceil(this.totalItems / this.perPage);
-        console.log(this.feedbackList);     
+        console.log("this.feedbackList inside fetchFeedback: ", this.feedbackList);     
       } catch (error) {
         console.error("Error fetching feedback:", error);
       }

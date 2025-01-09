@@ -22,6 +22,7 @@
   {{ console.log("Just Types: ", store.types) }}
   {{ console.log("Selected Types: ", store.selectedTypes) }}
   {{ console.log("This is THE SELECTED OPTION: ", store.completed) }}
+  {{ console.log("This is THE FEEDBACK: ", store.feedbackList) }}
 </template>
 
 <script setup>

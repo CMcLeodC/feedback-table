@@ -166,7 +166,7 @@ class Users(db.Model):
         return f"<User id={self.id}, username='{self.username}', email='{self.email}', role_id={self.role_id}, created_at={self.created_at}>"
 
 class Dreamers_Users(db.Model):
-    __tablename__ = 'dreamers_users'
+    __tablename__ = 'dreamer_user'
 
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
     dreamer_id = db.Column(db.Integer, db.ForeignKey('dreamers.id'), primary_key=True)
