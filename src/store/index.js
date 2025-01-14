@@ -15,10 +15,11 @@ export const useStore = defineStore('storeID', {
       { key: 'actions', title: '', sortable: false },
     ]),
     feedbackList: [],
-    sortBy: "user_name",
+    sortBy: "created_at",
     filterValue: "",
     sortDesc: false,
     currentPage: 1,
+    previousPage: 0,
     perPage: 30,
     dataTotal: 30,
     pageCount: 3,
@@ -39,9 +40,9 @@ export const useStore = defineStore('storeID', {
   actions: {
     async fetchFeedback() {
       try {
-        const response = await fetch(`/api/feedback?filter=${this.filterValue}&sort=${this.sortBy}&desc=${this.sortDesc}&page=${this.currentPage}&per_page=${this.perPage}`);
+        const response = await fetch(`/api/feedback?filter=${this.filterValue}&sort=${this.sortBy}&desc=${this.sortDesc}&page=${this.currentPage}&per_page=${this.perPage}&last_seen_created_at=${this.previousPage}`);
         const data = await response.json();
-        this.feedbackList = data.data;
+        this.feedbackList = data.data;       
         this.totalItems = data.total;
         this.pageCount = Math.ceil(this.totalItems / this.perPage);
         console.log("this.feedbackList inside fetchFeedback: ", this.feedbackList);     
