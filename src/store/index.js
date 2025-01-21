@@ -43,7 +43,7 @@ export const useStore = defineStore('storeID', {
         const response = await fetch(`/api/feedback?filter=${this.filterValue}&sort=${this.sortBy}&desc=${this.sortDesc}&page=${this.currentPage}&per_page=${this.perPage}&last_seen_page=${this.previousPage}`);
         const data = await response.json();
         console.log("this is data (from await response.json", data);
-        this.feedbackList = data;       
+        this.feedbackList = data.data;       
         this.totalItems = data.total;
         this.pageCount = Math.ceil(this.totalItems / this.perPage);
         console.log("this.feedbackList inside fetchFeedback: ", this.feedbackList);     

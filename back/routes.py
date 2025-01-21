@@ -3,7 +3,8 @@ from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from models import db, Contents, Dreamers, Users, Levels, Feedback, Dreamers_Users, Contents_Marketplace, Languages, ContentsArts, ContentsFeedbackCategories, Feedback_Types, ContentsFeedbackSubcategories
 from dotenv import load_dotenv
-from sqlalchemy import text, func, and_, or_
+from sqlalchemy import text, func, and_, or_, event
+import time
 from sqlalchemy.orm import joinedload, aliased
 import os
 
@@ -219,15 +220,13 @@ def feedback():
         Dreamers.name.label("dreamer_name"),
         Dreamers.avatar.label("dreamer_avatar"),
         Feedback.level_id,
-        Levels.name.label("level_name"),
         Feedback.total_score,
         Feedback.score,
         Feedback.failures,
         Feedback.content_id,
         Feedback.lang_id
     ).join(Dreamers, Feedback.dreamer_id == Dreamers.id) \
-    .join(Users, Feedback.user_id == Users.id) \
-    .join(Levels, Feedback.level_id == Levels.id)
+    .join(Users, Feedback.user_id == Users.id)
 
     if filter_value:
         filter_pattern = f"%{filter_value}%"
@@ -238,12 +237,12 @@ def feedback():
 
     sortable_fields = {
         'created_at': Feedback.created_at,
-        'id': Feedback.id
-        # 'duration': Feedback.duration,
-        # 'score': Feedback.score,
-        # 'user_name': Users.name,
-        # 'dreamer_name': Dreamers.name,
-        # 'level_name': Levels.name
+        'id': Feedback.id,
+        'duration': Feedback.duration,
+        'score': Feedback.score,
+        'user_name': Users.name,
+        'dreamer_name': Dreamers.name,
+        'level_name': Levels.name
     }
 
 
@@ -279,8 +278,25 @@ def feedback():
 
     user_map = {user.id: user.name for user in users}
     dreamer_map = {dreamer.id: dreamer.name for dreamer in dreamers}
+    level_map = {
+        1: 'Apprentice',
+        2: 'Intermediate',
+        3: 'Advanced',
+        4: 'Master'
+    }
 
-    total = db.session.query(Feedback.id).count()
+    # total = db.session.query(Feedback.id).count()
+
+    total_rows_query = text("""
+        SELECT TABLE_ROWS 
+        FROM information_schema.tables 
+        WHERE TABLE_SCHEMA = :schema AND TABLE_NAME = :table
+    """)
+    result = db.session.execute(
+        total_rows_query,
+        {"schema": "feedback", "table": "feedback"}
+    )
+    total_rows = result.scalar()
 
     data = [{
         'id': feedback.id,
@@ -293,14 +309,14 @@ def feedback():
         'dreamer_name': dreamer_map.get(feedback.dreamer_id, None),
         'dreamer_avatar': feedback.dreamer_avatar,
         'level_id': feedback.level_id,
-        'level_name': feedback.level_name,
+        'level_name': level_map.get(feedback.level_id, None),
         'total_score': feedback.total_score,
         'content_title': title_map.get((feedback.content_id, feedback.lang_id), None)
     } for feedback in feedbacks]
     
     return jsonify ({
         'data': data,
-        'total': total
+        'total': total_rows
     }), 200
 
 
@@ -526,5 +542,13 @@ def get_dreamer_avatar(filename):
 
 if __name__ == '__main__':
     with app.app_context():
+        @event.listens_for(db.engine, "before_cursor_execute")
+        def before_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+            context._query_start_time = time.time()
+
+        @event.listens_for(db.engine, "after_cursor_execute")
+        def after_cursor_execute(conn, cursor, statement, parameters, context, executemany):
+            total_time = time.time() - context._query_start_time
+            print(f"Query: {statement} executed in {total_time:.5f} seconds")
         db.create_all()
     app.run(debug=True)

@@ -5,6 +5,7 @@
             <span>Page {{ currentPage }} of {{ pageCount }}</span>
             <button :disabled="currentPage === pageCount" @click="nextPage">Next</button>
         </div>
+        {{ console.log("console log feedbackList from the table", feedbackList) }}
         <table class="table">
             <thead>
                 <tr>
