@@ -220,7 +220,6 @@ def feedback():
         Dreamers.name.label("dreamer_name"),
         Dreamers.avatar.label("dreamer_avatar"),
         Feedback.level_id,
-        Levels.name.label("level_name"),
         Feedback.total_score,
         Feedback.score,
         Feedback.failures,
@@ -238,12 +237,12 @@ def feedback():
 
     sortable_fields = {
         'created_at': Feedback.created_at,
-        'id': Feedback.id
-        # 'duration': Feedback.duration,
-        # 'score': Feedback.score,
-        # 'user_name': Users.name,
-        # 'dreamer_name': Dreamers.name,
-        # 'level_name': Levels.name
+        'id': Feedback.id,
+        'duration': Feedback.duration,
+        'score': Feedback.score,
+        'user_name': Users.name,
+        'dreamer_name': Dreamers.name,
+        'level_name': Levels.name
     }
 
 
@@ -286,7 +285,18 @@ def feedback():
         4: 'Master'
     }
 
-    total = db.session.query(Feedback.id).count()
+    # total = db.session.query(Feedback.id).count()
+
+    total_rows_query = text("""
+        SELECT TABLE_ROWS 
+        FROM information_schema.tables 
+        WHERE TABLE_SCHEMA = :schema AND TABLE_NAME = :table
+    """)
+    result = db.session.execute(
+        total_rows_query,
+        {"schema": "feedback", "table": "feedback"}
+    )
+    total_rows = result.scalar()
 
     data = [{
         'id': feedback.id,
@@ -306,7 +316,7 @@ def feedback():
     
     return jsonify ({
         'data': data,
-        'total': total
+        'total': total_rows
     }), 200
 
 
