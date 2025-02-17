@@ -115,60 +115,64 @@ class Dreamers(db.Model):
         return f'<Dreamers id={self.id}, name={self.name}>'
 
 class Users(db.Model):
-    __tablename__ = 'users'
+    __tablename__ = 'simple_users'
 
     id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(255))
-    username = db.Column(db.String(255))
-    email = db.Column(db.String(255))
-    is_college = db.Column(db.Boolean)
-    allowed_access_la = db.Column(db.Boolean)
-    validated = db.Column(db.Boolean)
-    teacher_college = db.Column(db.Boolean)
-    is_third_party = db.Column(db.Boolean)
-    max_children = db.Column(db.Integer)
-    max_devices = db.Column(db.Integer)
-    details = db.Column(db.Text)
-    welcomed = db.Column(db.Boolean)
-    # privacy_accepted = db.Column(db.Boolean)
-    privacy_accepted = db.Column(db.DateTime)
-    lang_id = db.Column(db.Integer)
-    emailing = db.Column(db.Boolean)
-    zero_emailing = db.Column(db.Boolean)
-    email1 = db.Column(db.String(255))
-    library_version_id = db.Column(db.Integer)
-    last_remindered = db.Column(db.DateTime)
-    braintree_id = db.Column(db.String(255))
-    paypal_email = db.Column(db.String(255))
-    card_brand = db.Column(db.String(255))
-    card_last_four = db.Column(db.String(10))
-    trial_ends_at = db.Column(db.DateTime)
-    braintree_subscription_id = db.Column(db.String(255))
-    web = db.Column(db.Boolean)
-    stripe_id = db.Column(db.String(255))
-    pm_type = db.Column(db.String(255))
-    pm_last_four = db.Column(db.String(10))
-    has_child_creation_password = db.Column(db.Boolean)
-    pending_unsubscribe = db.Column(db.Boolean)
-    pending_delete = db.Column(db.Boolean)
-    # sso = db.Column(db.Boolean)
-    sso = db.Column(db.String(255))
-    sso_provider = db.Column(db.String(255))
-    sso_provider_uuid = db.Column(db.String(255))
-    password = db.Column(db.String(255))
-    remember_token = db.Column(db.String(255))
-    role_id = db.Column(db.Integer)
-    created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
-    updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
-    deleted_at = db.Column(db.DateTime)
+    # uuid = db.Column(db.String(255))
+    username = db.Column(db.String(255), nullable=False)
+    # email = db.Column(db.String(255))
+    # is_college = db.Column(db.Boolean)
+    # allowed_access_la = db.Column(db.Boolean)
+    # validated = db.Column(db.Boolean)
+    # teacher_college = db.Column(db.Boolean)
+    # is_third_party = db.Column(db.Boolean)
+    # max_children = db.Column(db.Integer)
+    # max_devices = db.Column(db.Integer)
+    # details = db.Column(db.Text)
+    # welcomed = db.Column(db.Boolean)
+    # # privacy_accepted = db.Column(db.Boolean)
+    # privacy_accepted = db.Column(db.DateTime)
+    # lang_id = db.Column(db.Integer)
+    # emailing = db.Column(db.Boolean)
+    # zero_emailing = db.Column(db.Boolean)
+    # email1 = db.Column(db.String(255))
+    # library_version_id = db.Column(db.Integer)
+    # last_remindered = db.Column(db.DateTime)
+    # braintree_id = db.Column(db.String(255))
+    # paypal_email = db.Column(db.String(255))
+    # card_brand = db.Column(db.String(255))
+    # card_last_four = db.Column(db.String(10))
+    # trial_ends_at = db.Column(db.DateTime)
+    # braintree_subscription_id = db.Column(db.String(255))
+    # web = db.Column(db.Boolean)
+    # stripe_id = db.Column(db.String(255))
+    # pm_type = db.Column(db.String(255))
+    # pm_last_four = db.Column(db.String(10))
+    # has_child_creation_password = db.Column(db.Boolean)
+    # pending_unsubscribe = db.Column(db.Boolean)
+    # pending_delete = db.Column(db.Boolean)
+    # # sso = db.Column(db.Boolean)
+    # sso = db.Column(db.String(255))
+    # sso_provider = db.Column(db.String(255))
+    # sso_provider_uuid = db.Column(db.String(255))
+    # password = db.Column(db.String(255))
+    # remember_token = db.Column(db.String(255))
+    # role_id = db.Column(db.Integer)
+    # created_at = db.Column(db.DateTime, default=db.func.current_timestamp())
+    # updated_at = db.Column(db.DateTime, default=db.func.current_timestamp(), onupdate=db.func.current_timestamp())
+    # deleted_at = db.Column(db.DateTime)
 
+    # def __repr__(self):
+    #     return f"<User id={self.id}, username='{self.username}', email='{self.email}', role_id={self.role_id}, created_at={self.created_at}>"
+    # dreamers_users = db.relationship('Dreamers_Users', backref='user', lazy=True)
+    # feedback = db.relationship('Feedback', backref='user', lazy=True)
     def __repr__(self):
-        return f"<User id={self.id}, username='{self.username}', email='{self.email}', role_id={self.role_id}, created_at={self.created_at}>"
+        return f"<User id={self.id}, username='{self.username}'>"
 
 class Dreamers_Users(db.Model):
     __tablename__ = 'dreamer_user'
 
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('simple:users.id'), primary_key=True)
     dreamer_id = db.Column(db.Integer, db.ForeignKey('dreamers.id'), primary_key=True)
     rol = db.Column(db.String(10))
     link_in_process = db.Column(db.Boolean, default=False)
@@ -220,7 +224,7 @@ class Feedback(db.Model):
     __tablename__ = 'feedback'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user_id = db.Column(db.Integer, db.ForeignKey('simple_users.id'))
     dreamer_id = db.Column(db.Integer, db.ForeignKey('dreamers.id'))
     content_id = db.Column(db.Integer, db.ForeignKey('contents.id'))
     library_version_id = db.Column(db.Integer)
@@ -250,34 +254,6 @@ class Feedback(db.Model):
     level = db.relationship('Levels', backref='feedbacks')
     language = db.relationship('Languages', backref='feedbacks')
     types = db.relationship('Feedback_Types', backref='feedbacks')
-
-    content_data = db.relationship(
-        'Contents_Marketplace',
-        primaryjoin=and_(
-            foreign(content_id) == Contents_Marketplace.content_id,
-            foreign(lang_id) == Contents_Marketplace.lang_id
-        ),
-        viewonly=True,
-        uselist=True
-    )
-
-    category_name = db.relationship(
-        'ContentsFeedbackCategories',
-        primaryjoin=and_(
-            foreign(content_id) == ContentsFeedbackCategories.content_id,
-            foreign(category_id) == ContentsFeedbackCategories.category_id
-        ),
-        viewonly=True
-    )
-
-    subcategory_name = db.relationship(
-        'ContentsFeedbackSubcategories',
-        primaryjoin=and_(
-            foreign(content_id) == ContentsFeedbackSubcategories.content_id,
-            foreign(subcategory_id) == ContentsFeedbackSubcategories.subcategory_id
-        ),
-        viewonly=True
-    )
 
     def serialize(self):
         return {

@@ -1,9 +1,11 @@
 <template>
   <div class="app-container">
     <h1>Feedback</h1>
-    <!-- <VuetifyTable /> -->
+    <Dialog></Dialog>
     <v-icon icon="fa:fas fa-search"></v-icon>
     <div class="input-field">
+    {{ console.log(store.filterValue) }}
+    {{ console.log("store.contentArt.thumbnail_url: ", store.contentArt.thumbnail_url) }}
       <input type="search" v-model="store.filterValue" id="search-bar" placeholder="Search feedback..."
         @keyup.enter="store.fetchFeedback">
       </div>
@@ -15,7 +17,6 @@
     <AdvancedFilter />
     <TableFeedback :feedbackList="feedbackList" :fields="store.fields" :sortBy="sortBy" :sortDesc="sortDesc" />
 
-    <!-- <MoreInfoModal :moreInfo="moreInfo" /> -->
     <VuetifyModal />
   </div>
   {{console.log("Selected Languages: ", store.selectedLanguages)}}
@@ -27,9 +28,7 @@
 
 <script setup>
 import { onMounted, ref, watch, computed } from 'vue'
-import MoreInfoModal from './components/MoreInfoModal.vue';
 import TableFeedback from './components/TableFeedback.vue';
-// import Bootstraptable from './components/Bootstraptable.vue';
 import { useStore } from './store';
 import { storeToRefs } from 'pinia';
 import VuetifyTable from './components/VuetifyTable.vue';
@@ -38,6 +37,7 @@ import openModal from './components/VuetifyModal.vue';
 import AdvancedFilter from './components/AdvancedFilter.vue';
 import DatePicker from './components/DatePicker.vue';
 import TypeFilterGroup from './components/TypeFilterGroup.vue';
+import Dialog from './components/Dialog.vue';
 const store = useStore()
 
 const { fields, fetchFeedback, } = storeToRefs(store)
@@ -50,7 +50,7 @@ const sortBy = ref("user_name");
 const sortDesc = ref(false);
 const selectedID = ref(null);
 const perPage = ref(30);
-// const currentPage = ref(1);
+const currentPage = ref(1);
 const totalRows = ref(null)
 
 const rows = computed(() => feedbackList.value.length)

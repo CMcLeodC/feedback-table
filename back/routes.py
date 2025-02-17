@@ -7,20 +7,28 @@ from sqlalchemy import text, func, and_, or_, event
 import time
 from sqlalchemy.orm import joinedload, aliased
 import os
+import logging
 
 app = Flask(__name__)
 
 load_dotenv()
+
+app.debug = True
+app.logger.setLevel(logging.INFO)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_URI')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db.init_app(app)
 
+print(app.url_map)
+
 @app.route('/contents', methods=['GET'])
 def get_contents():
     contents = Contents.query.all()
     return jsonify([content.__repr__() for content in contents]), 200
+
+
 
 @app.route('/contents/<int:id>', methods=['GET'])
 def get_content_by_id(id):
@@ -140,47 +148,47 @@ def get_user_by_id(id):
     user = Users.query.get_or_404(id)
     return jsonify({
         "id": user.id,
-        "name": user.name,
+        # "name": user.name,
         "username": user.username,
-        "email": user.email,
-        "is_college": user.is_college,
-        "allowed_access_la": user.allowed_access_la,
-        "validated": user.validated,
-        "teacher_college": user.teacher_college,
-        "is_third_party": user.is_third_party,
-        "max_children": user.max_children,
-        "max_devices": user.max_devices,
-        "details": user.details,
-        "welcomed": user.welcomed,
-        "privacy_accepted": user.privacy_accepted,
-        "lang_id": user.lang_id,
-        "emailing": user.emailing,
-        "zero_emailing": user.zero_emailing,
-        "email1": user.email1,
-        "library_version_id": user.library_version_id,
-        "last_remindered": user.last_remindered,
-        "braintree_id": user.braintree_id,
-        "paypal_email": user.paypal_email,
-        "card_brand": user.card_brand,
-        "card_last_four": user.card_last_four,
-        "trial_ends_at": user.trial_ends_at,
-        "braintree_subscription_id": user.braintree_subscription_id,
-        "web": user.web,
-        "stripe_id": user.stripe_id,
-        "pm_type": user.pm_type,
-        "pm_last_four": user.pm_last_four,
-        "has_child_creation_password": user.has_child_creation_password,
-        "pending_unsubscribe": user.pending_unsubscribe,
-        "pending_delete": user.pending_delete,
-        "sso": user.sso,
-        "sso_provider": user.sso_provider,
-        "sso_provider_uuid": user.sso_provider_uuid,
-        "password": user.password,
-        "remember_token": user.remember_token,
-        "role_id": user.role_id,
-        "created_at": user.created_at,
-        "updated_at": user.updated_at,
-        "deleted_at": user.deleted_at
+        # "email": user.email,
+        # "is_college": user.is_college,
+        # "allowed_access_la": user.allowed_access_la,
+        # "validated": user.validated,
+        # "teacher_college": user.teacher_college,
+        # "is_third_party": user.is_third_party,
+        # "max_children": user.max_children,
+        # "max_devices": user.max_devices,
+        # "details": user.details,
+        # "welcomed": user.welcomed,
+        # "privacy_accepted": user.privacy_accepted,
+        # "lang_id": user.lang_id,
+        # "emailing": user.emailing,
+        # "zero_emailing": user.zero_emailing,
+        # "email1": user.email1,
+        # "library_version_id": user.library_version_id,
+        # "last_remindered": user.last_remindered,
+        # "braintree_id": user.braintree_id,
+        # "paypal_email": user.paypal_email,
+        # "card_brand": user.card_brand,
+        # "card_last_four": user.card_last_four,
+        # "trial_ends_at": user.trial_ends_at,
+        # "braintree_subscription_id": user.braintree_subscription_id,
+        # "web": user.web,
+        # "stripe_id": user.stripe_id,
+        # "pm_type": user.pm_type,
+        # "pm_last_four": user.pm_last_four,
+        # "has_child_creation_password": user.has_child_creation_password,
+        # "pending_unsubscribe": user.pending_unsubscribe,
+        # "pending_delete": user.pending_delete,
+        # "sso": user.sso,
+        # "sso_provider": user.sso_provider,
+        # "sso_provider_uuid": user.sso_provider_uuid,
+        # "password": user.password,
+        # "remember_token": user.remember_token,
+        # "role_id": user.role_id,
+        # "created_at": user.created_at,
+        # "updated_at": user.updated_at,
+        # "deleted_at": user.deleted_at
     }), 200
 
 
@@ -200,6 +208,7 @@ def get_feedback_types():
     return jsonify([type.__repr__() for type in types]), 200
 
 
+
 @app.route('/feedback', methods=['GET'])
 def feedback():
     filter_value = request.args.get('filter', '')
@@ -207,7 +216,9 @@ def feedback():
     desc = request.args.get('desc', 'false').lower() == 'true'
     page = int(request.args.get('page', 1))
     per_page = int(request.args.get('per_page', 30))
-    last_seen_page = int(request.args.get('previous_page', 0))
+
+    app.logger.info(f"Request Params - Filter: {filter_value}, Sort: {sort_field}, Desc: {desc}, Page: {page}, Per Page: {per_page}")
+
 
     query = db.session.query(
         Feedback.id,
@@ -215,7 +226,7 @@ def feedback():
         Feedback.duration,
         Feedback.score,
         Feedback.user_id,
-        Users.name.label("user_name"),
+        Users.username.label("user_name"),
         Feedback.dreamer_id,
         Dreamers.name.label("dreamer_name"),
         Dreamers.avatar.label("dreamer_avatar"),
@@ -230,30 +241,31 @@ def feedback():
 
     if filter_value:
         filter_pattern = f"%{filter_value}%"
-        query = query.filter(
-            (Users.name.ilike(filter_pattern)) |
-            (Dreamers.name.ilike(filter_pattern)) 
-        )
+        query = query.filter(func.lower(Users.username).like(func.lower(filter_pattern)))
+        app.logger.info(f"Applied Filter - Filter Pattern: {filter_pattern}")
+
+    # query = query.order_by(Feedback.created_at).limit(30)
 
     sortable_fields = {
         'created_at': Feedback.created_at,
         'id': Feedback.id,
         'duration': Feedback.duration,
         'score': Feedback.score,
-        'user_name': Users.name,
+        'user_name': Users.username,
         'dreamer_name': Dreamers.name,
         'level_name': Levels.name
     }
 
-
     if sort_field in sortable_fields:
         sort_column = sortable_fields[sort_field]
         query = query.order_by(sort_column.desc() if desc else sort_column.asc())
-
-    if last_seen_page:
-        query = query.filter(Feedback.created_at > last_seen_page)
+        app.logger.info(f"Applied Sorting - Field: {sort_field}, Desc: {desc}")
+    
+    offset = (page - 1) * per_page
+    query = query.offset(offset).limit(per_page) 
 
     feedbacks = query.limit(per_page).all()
+    app.logger.info(f"Feedback Query Results: {feedbacks}")
 
     content_lang_pairs = [(fb.content_id, fb.lang_id) for fb in feedbacks]
     titles = db.session.query(
@@ -276,7 +288,7 @@ def feedback():
     users = db.session.query(Users).filter(Users.id.in_(user_ids)).all()
     dreamers = db.session.query(Dreamers).filter(Dreamers.id.in_(dreamer_ids)).all()
 
-    user_map = {user.id: user.name for user in users}
+    user_map = {user.id: user.username for user in users}
     dreamer_map = {dreamer.id: dreamer.name for dreamer in dreamers}
     level_map = {
         1: 'Apprentice',
@@ -297,6 +309,8 @@ def feedback():
         {"schema": "feedback", "table": "feedback"}
     )
     total_rows = result.scalar()
+    app.logger.info(f"Total Rows: {total_rows}")
+   
 
     data = [{
         'id': feedback.id,
@@ -313,11 +327,13 @@ def feedback():
         'total_score': feedback.total_score,
         'content_title': title_map.get((feedback.content_id, feedback.lang_id), None)
     } for feedback in feedbacks]
+    app.logger.info(f"Response Data: {data}")
     
     return jsonify ({
         'data': data,
         'total': total_rows
     }), 200
+
 
 
 @app.route('/feedback/<int:id>', methods=['GET'])

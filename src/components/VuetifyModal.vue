@@ -50,9 +50,9 @@
         <!-- Card 2 -->
 
         <v-col cols="12" md="4">
-          <v-card class="counter-card mx-auto" max-width="344">
+          <v-card class="contents-card mx-auto" max-width="344">
             <template v-slot:title>
-              <h1 class="modal-header">Counter</h1>
+              <h1 class="modal-header">Contents</h1>
             </template>
             <v-card-text>
               <v-img class="thumbnail-art" height="200" :src="store.contentArt.thumbnail_url" cover></v-img>
@@ -124,11 +124,9 @@
 <script setup>
 import { useStore } from '../store';
 import { storeToRefs } from 'pinia';
-import { ref } from 'vue';
 
 const store = useStore();
 const { cards, dreamerInfo, userInfo, contentArt } = storeToRefs(store);
-// const showModal = ref(false);
 console.log(contentArt);
 
 const closeModal = () => {
@@ -196,7 +194,7 @@ h1 {
 }
 
 .v-card.player-card, 
-.v-card.counter-card, 
+.v-card.contents-card, 
 .v-card.game-card {
   background-color: #2A2A3B !important; 
   color: #FFFFFF !important;
@@ -218,7 +216,7 @@ h1 {
   background-color: #2A2A3B; /* Matches table's odd rows */
 }
 
-.v-col .v-card.counter-card {
+.v-col .v-card.contents-card {
   background-color: #1E1E2F; /* Matches table's even rows */
 }
 
